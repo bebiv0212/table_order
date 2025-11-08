@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:table_order/theme/app_colors.dart';
 import 'package:table_order/widgets/common_widgets/rounded_rec_button.dart';
 
-class LoginBaseForm extends StatelessWidget {
-  const LoginBaseForm({
+class LoginForm extends StatelessWidget {
+  const LoginForm({
     super.key,
     required this.mode,
     required this.title,

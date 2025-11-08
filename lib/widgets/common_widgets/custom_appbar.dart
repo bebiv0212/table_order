@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
+import 'package:provider/provider.dart';
+import 'package:table_order/providers/auth_provider.dart';
+import 'package:table_order/screens/select_screen.dart';
 
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   const CustomAppBar({
@@ -38,8 +41,8 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                 ),
               ),
               Text(
-                '테이블 $description',
-                style: const TextStyle(
+                description,
+                style: TextStyle(
                   color: Colors.black54,
                   fontSize: 20,
                   fontWeight: FontWeight.w400,
@@ -56,7 +59,15 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
         Padding(
           padding: EdgeInsets.only(right: 10),
           child: IconButton(
-            onPressed: () {}, //
+            onPressed: () async {
+              await context.read<AuthProvider>().signOut();
+              if (!context.mounted) return;
+              Navigator.pushAndRemoveUntil(
+                context,
+                MaterialPageRoute(builder: (_) => SelectScreen()),
+                (route) => false,
+              );
+            }, //
             icon: Icon(LucideIcons.logOut),
           ),
         ),
@@ -65,5 +76,5 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   }
 
   @override
-  Size get preferredSize => const Size.fromHeight(80);
+  Size get preferredSize => Size.fromHeight(80);
 }

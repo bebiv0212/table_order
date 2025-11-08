@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:table_order/screens/auth/admin_login_screen.dart';
 import 'package:table_order/screens/auth/customer_login_screen.dart';
 import 'package:table_order/theme/app_colors.dart';

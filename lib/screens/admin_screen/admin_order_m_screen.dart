@@ -4,14 +4,15 @@ import 'package:table_order/widgets/common_widgets/appbar_action_btn.dart';
 import 'package:table_order/widgets/common_widgets/custom_appbar.dart';
 
 class AdminOrderMScreen extends StatelessWidget {
-  const AdminOrderMScreen({super.key});
+  final String shopName;
+  const AdminOrderMScreen({super.key, required this.shopName});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Color.fromARGB(255, 250, 250, 250),
       appBar: CustomAppBar(
-        storeName: '맛있는 식당' + ' 관리', //
+        storeName: '$shopName 관리',
         description: '실시간 주문 현황',
         actionBtn1: AppbarActionBtn(
           icon: LucideIcons.receiptText,
@@ -22,7 +23,7 @@ class AdminOrderMScreen extends StatelessWidget {
           title: '리뷰관리',
         ),
       ),
-      body: SafeArea(child: Column(children: [])),
+      body: SafeArea(child: Center(child: Text('주문 데이터 불러오는 중...'))),
     );
   }
 }

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 class AppbarActionBtn extends StatelessWidget {
   const AppbarActionBtn({super.key, required this.icon, required this.title});
