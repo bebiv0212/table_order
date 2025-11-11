@@ -23,7 +23,7 @@ class _AdminSignupScreenState extends State<AdminSignupScreen> {
   @override
   Widget build(BuildContext context) {
     final auth = context.watch<AuthProvider>();
-    final mode = AppMode.admin;
+    const mode = AppMode.admin;
 
     return LoginForm(
       mode: mode,
@@ -62,10 +62,14 @@ class _AdminSignupScreenState extends State<AdminSignupScreen> {
         final pw = _pwController.text.trim();
         final pwCheck = _pwCheckController.text.trim();
 
+        // ✅ context 기반 객체 미리 캡처
+        final messenger = ScaffoldMessenger.of(context);
+        final navigator = Navigator.of(context);
+
         if (pw != pwCheck) {
-          ScaffoldMessenger.of(
-            context,
-          ).showSnackBar(SnackBar(content: Text('비밀번호가 일치하지 않습니다')));
+          messenger.showSnackBar(
+            const SnackBar(content: Text('비밀번호가 일치하지 않습니다')),
+          );
           return;
         }
 
@@ -75,15 +79,12 @@ class _AdminSignupScreenState extends State<AdminSignupScreen> {
           password: pw,
         );
 
-        if (!context.mounted) return;
+        if (!mounted) return;
 
         if (err != null) {
-          ScaffoldMessenger.of(
-            context,
-          ).showSnackBar(SnackBar(content: Text(err)));
+          messenger.showSnackBar(SnackBar(content: Text(err)));
         } else {
-          Navigator.pushAndRemoveUntil(
-            context,
+          navigator.pushAndRemoveUntil(
             MaterialPageRoute(
               builder: (_) =>
                   AdminOrderMScreen(shopName: auth.shopName ?? shop),

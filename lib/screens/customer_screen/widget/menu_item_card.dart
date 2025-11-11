@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:table_order/theme/app_colors.dart';
+import 'package:table_order/utlis/format_utils.dart';
 
 /// 메뉴 리스트에서 개별 메뉴를 보여주는 카드 UI.
 ///
@@ -17,27 +19,26 @@ class MenuItemCard extends StatelessWidget {
     required this.subtitle,
     required this.price,
     this.tagText,
-    required this.count,         // 현재 수량 (외부에서 내려받음)
-    required this.onIncrease,    // + 눌렀을 때 콜백
-    required this.onDecrease,    // - 눌렀을 때 콜백
-    this.onTap,                  // 카드 전체 터치 시 콜백 (상세보기 등)
+    required this.count, // 현재 수량 (외부에서 내려받음)
+    required this.onIncrease, // + 눌렀을 때 콜백
+    required this.onDecrease, // - 눌렀을 때 콜백
+    this.onTap, // 카드 전체 터치 시 콜백 (상세보기 등)
   });
 
-  final String imageUrl;   // 메뉴 이미지
-  final String title;      // 메뉴 제목
-  final String subtitle;   // 메뉴 설명
-  final int price;         // 단가
-  final String? tagText;   // 카테고리 태그 (ex. 음료, 디저트 등)
+  final String imageUrl; // 메뉴 이미지
+  final String title; // 메뉴 제목
+  final String subtitle; // 메뉴 설명
+  final int price; // 단가
+  final String? tagText; // 카테고리 태그 (ex. 음료, 디저트 등)
 
-  final int count;         // 현재 수량
-  final VoidCallback onIncrease;  // + 콜백
-  final VoidCallback onDecrease;  // - 콜백
-  final VoidCallback? onTap;      // 상세 클릭 콜백
+  final int count; // 현재 수량
+  final VoidCallback onIncrease; // + 콜백
+  final VoidCallback onDecrease; // - 콜백
+  final VoidCallback? onTap; // 상세 클릭 콜백
 
   @override
   Widget build(BuildContext context) {
-    const accent = Color(0xFFE8751A); // 브랜드 포인트 컬러
-    const radius = 12.0;              // 카드 라운드 정도
+    final radius = 12.0; // 카드 라운드 정도
 
     return InkWell(
       // InkWell: 카드 전체에 ripple 효과 부여 → 누를 수 있다는 시각적 피드백
@@ -45,9 +46,12 @@ class MenuItemCard extends StatelessWidget {
       borderRadius: BorderRadius.circular(radius),
 
       child: Card(
+        color: Colors.white,
         elevation: 1, // 살짝 떠있는 입체감
-        margin: const EdgeInsets.all(8),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(radius)),
+        margin: EdgeInsets.all(8),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(radius),
+        ),
         clipBehavior: Clip.antiAlias, // 이미지 모서리 잘림 방지
         child: SizedBox.expand(
           // SizedBox.expand: 부모 Grid 셀 크기에 자동 맞춤
@@ -64,20 +68,24 @@ class MenuItemCard extends StatelessWidget {
                   // errorBuilder: 이미지 로드 실패 대비
                   errorBuilder: (_, __, ___) => Container(
                     color: Colors.grey[200],
-                    child: const Icon(Icons.broken_image, size: 36, color: Colors.black45),
+                    child: Icon(
+                      Icons.broken_image,
+                      size: 36,
+                      color: Colors.black45,
+                    ),
                   ),
                 ),
               ),
 
               // 제목 + 태그
               Padding(
-                padding: const EdgeInsets.fromLTRB(12, 10, 12, 4),
+                padding: EdgeInsets.fromLTRB(12, 10, 12, 4),
                 child: Row(
                   children: [
                     Expanded(
                       child: Text(
                         title,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
                           color: Colors.black87,
@@ -88,15 +96,18 @@ class MenuItemCard extends StatelessWidget {
                     // 태그가 있을 경우만 표시
                     if (tagText != null && tagText!.isNotEmpty)
                       Container(
-                        margin: const EdgeInsets.only(left: 6),
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        margin: EdgeInsets.only(left: 6),
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 4,
+                        ),
                         decoration: BoxDecoration(
                           color: Colors.grey[100],
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: Text(
                           tagText!,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 11,
                             color: Colors.black54,
                             fontWeight: FontWeight.w600,
@@ -109,31 +120,30 @@ class MenuItemCard extends StatelessWidget {
 
               // 설명 영역
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 12),
+                padding: EdgeInsets.symmetric(horizontal: 12),
                 child: Text(
                   subtitle,
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
                     fontSize: 13,
-                    color: Colors.black.withOpacity(0.6),
+                    color: Color.fromARGB(153, 0, 0, 0),
                   ),
                 ),
               ),
 
-              const Spacer(), // 남는 공간 밀어 내기
-
+              Spacer(), // 남는 공간 밀어 내기
               // 가격 + 수량 조절/담기
               Padding(
-                padding: const EdgeInsets.fromLTRB(12, 4, 12, 10),
+                padding: EdgeInsets.fromLTRB(12, 4, 12, 10),
                 child: Row(
                   children: [
                     // 가격 표시
                     Expanded(
                       child: Text(
-                        '${_formatWon(price)}원',
-                        style: const TextStyle(
-                          color: accent,
+                        '${formatWon(price)}원',
+                        style: TextStyle(
+                          color: AppColors.customerPrimary,
                           fontWeight: FontWeight.bold,
                           fontSize: 15,
                         ),
@@ -147,14 +157,14 @@ class MenuItemCard extends StatelessWidget {
                         height: 32,
                         child: ElevatedButton.icon(
                           onPressed: onIncrease, // 최초 클릭 시 1개 담기
-                          icon: const Icon(Icons.add, size: 14),
-                          label: const Text('담기', style: TextStyle(fontSize: 13)),
+                          icon: Icon(Icons.add, size: 14),
+                          label: Text('담기', style: TextStyle(fontSize: 13)),
 
                           // - 담기는 첫 액션(Primary Action) → 강조 필요, OutlinedButton이나 TextButton보다 명확한 CTA, elevation=0으로 납작하게 만들어 too-heavy 느낌 방지.
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: accent,
+                            backgroundColor: AppColors.customerPrimary,
                             foregroundColor: Colors.white,
-                            padding: const EdgeInsets.symmetric(horizontal: 10),
+                            padding: EdgeInsets.symmetric(horizontal: 10),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(8),
                             ),
@@ -163,10 +173,10 @@ class MenuItemCard extends StatelessWidget {
                         ),
                       )
                     else
-                    // 수량 조절 UI ( -  count  + )
+                      // 수량 조절 UI ( -  count  + )
                       Container(
                         height: 36,
-                        padding: const EdgeInsets.symmetric(horizontal: 4),
+                        padding: EdgeInsets.symmetric(horizontal: 4),
                         decoration: BoxDecoration(
                           border: Border.all(color: Colors.black26),
                           borderRadius: BorderRadius.circular(8),
@@ -176,7 +186,7 @@ class MenuItemCard extends StatelessWidget {
                           children: [
                             // - 버튼
                             IconButton(
-                              icon: const Icon(Icons.remove, size: 18),
+                              icon: Icon(Icons.remove, size: 18),
                               // IconButton을 쓴 이유:
                               // • 터치 영역 자동 확보(48dp)
                               // • InkWell보다 간단하게 ripple 및 hover 처리
@@ -186,7 +196,7 @@ class MenuItemCard extends StatelessWidget {
                             // 현재 수량 텍스트
                             Text(
                               '$count',
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 15,
                                 fontWeight: FontWeight.w500,
                               ),
@@ -194,7 +204,11 @@ class MenuItemCard extends StatelessWidget {
 
                             // + 버튼
                             IconButton(
-                              icon: const Icon(Icons.add, color: accent, size: 18),
+                              icon: Icon(
+                                Icons.add,
+                                color: AppColors.customerPrimary,
+                                size: 18,
+                              ),
                               onPressed: onIncrease,
                             ),
                           ],
@@ -208,19 +222,5 @@ class MenuItemCard extends StatelessWidget {
         ),
       ),
     );
-  }
-
-  /// 단가 표시용 숫자 포맷터 (ex: 12345 → 12,345)
-  // - intl 패키지 없이 간단히 구현.
-  // - 성능/의존성 측면에서 프로토타입 단계에 적합.
-  String _formatWon(int v) {
-    final s = v.toString();
-    final b = StringBuffer();
-    for (int i = 0; i < s.length; i++) {
-      final r = s.length - i;
-      b.write(s[i]);
-      if (i != s.length - 1 && (r - 1) % 3 == 0) b.write(',');
-    }
-    return b.toString();
   }
 }

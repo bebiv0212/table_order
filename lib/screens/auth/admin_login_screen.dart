@@ -45,20 +45,22 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
         final email = _email.text.trim();
         final pw = _password.text.trim();
 
+        // ✅ await 전 안전하게 캡처
+        final messenger = ScaffoldMessenger.of(context);
+        final navigator = Navigator.of(context);
+
         final err = await auth.signInAdmin(email: email, password: pw);
 
-        if (!context.mounted) return;
+        // ✅ await 이후 context 검사는 최소화 (State의 mounted만 확인)
+        if (!mounted) return;
 
         if (err != null) {
-          ScaffoldMessenger.of(
-            context,
-          ).showSnackBar(SnackBar(content: Text(err)));
+          messenger.showSnackBar(SnackBar(content: Text(err)));
           return;
         }
 
         // 로그인 성공 → 관리자 메인으로 이동
-        Navigator.pushAndRemoveUntil(
-          context,
+        navigator.pushAndRemoveUntil(
           MaterialPageRoute(
             builder: (_) => AdminOrderMScreen(
               shopName:
