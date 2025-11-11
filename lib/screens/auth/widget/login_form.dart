@@ -34,11 +34,11 @@ class LoginForm extends StatelessWidget {
       body: Center(
         child: Container(
           width: 420,
-          padding: const EdgeInsets.symmetric(vertical: 50, horizontal: 40),
+          padding: EdgeInsets.symmetric(vertical: 50, horizontal: 40),
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(20),
-            boxShadow: const [
+            boxShadow: [
               BoxShadow(
                 color: Colors.black12,
                 blurRadius: 10,
@@ -61,14 +61,11 @@ class LoginForm extends StatelessWidget {
                 ),
                 Text(
                   title,
-                  style: const TextStyle(
-                    fontSize: 22,
-                    fontWeight: FontWeight.w600,
-                  ),
+                  style: TextStyle(fontSize: 22, fontWeight: FontWeight.w600),
                 ),
                 Text(
                   subtitle,
-                  style: const TextStyle(fontSize: 16, color: Colors.black54),
+                  style: TextStyle(fontSize: 16, color: Colors.black54),
                   textAlign: TextAlign.center,
                 ),
                 ...fields,

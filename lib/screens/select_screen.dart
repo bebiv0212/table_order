@@ -14,7 +14,7 @@ class SelectScreen extends StatelessWidget {
       body: SafeArea(
         child: Center(
           child: Padding(
-            padding: const EdgeInsets.all(20),
+            padding: EdgeInsets.all(20),
             child: Column(
               spacing: 30,
               mainAxisAlignment: MainAxisAlignment.center,

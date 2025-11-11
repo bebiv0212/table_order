@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:table_order/utlis/format_utils.dart';
 
 /// 오른쪽에서 슬라이드로 열리는 장바구니 패널.
 ///
@@ -54,7 +55,7 @@ class CartSideSheet extends StatelessWidget {
           // 휴대폰은 0.9 정도로 조정 가능.
           width: MediaQuery.of(context).size.width * 0.4,
           height: double.infinity,
-          padding: const EdgeInsets.all(20), // 내부 패딩: 콘텐츠 간 간격 확보.
+          padding: EdgeInsets.all(20), // 내부 패딩: 콘텐츠 간 간격 확보.
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -62,26 +63,25 @@ class CartSideSheet extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text(
+                  Text(
                     '장바구니',
                     style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                   ),
                   // - 클릭 가능성 시각적으로 명확, 최소 터치 영역(48dp) 자동 확보, ripple + focus 효과 기본 제공.
                   IconButton(
-                    icon: const Icon(Icons.close),
+                    icon: Icon(Icons.close),
                     onPressed: () => Navigator.pop(context), // 모달 닫기
                   ),
                 ],
               ),
 
-              const SizedBox(height: 10),
+              SizedBox(height: 10),
 
               // 장바구니 리스트
               Expanded(
-
                 child: ListView.separated(
                   itemCount: cartItems.length,
-                  separatorBuilder: (_, __) => const SizedBox(height: 12),
+                  separatorBuilder: (_, __) => SizedBox(height: 12),
                   itemBuilder: (context, index) {
                     final item = cartItems[index];
                     final title = item['title'];
@@ -91,7 +91,7 @@ class CartSideSheet extends StatelessWidget {
 
                     return Container(
                       // 개별 아이템 카드 영역
-                      padding: const EdgeInsets.all(12),
+                      padding: EdgeInsets.all(12),
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(12),
                         border: Border.all(color: Colors.black12),
@@ -112,12 +112,12 @@ class CartSideSheet extends StatelessWidget {
                                 width: 60,
                                 height: 60,
                                 color: Colors.grey[200],
-                                child: const Icon(Icons.image_not_supported),
+                                child: Icon(Icons.image_not_supported),
                               ),
                             ),
                           ),
 
-                          const SizedBox(width: 12),
+                          SizedBox(width: 12),
 
                           // 상품명, 단가, 수량 조절
                           Expanded(
@@ -130,19 +130,19 @@ class CartSideSheet extends StatelessWidget {
                                   title,
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                     fontSize: 16,
                                     fontWeight: FontWeight.w600,
                                   ),
                                 ),
                                 Text(
-                                  '${_formatWon(price)}원',
-                                  style: const TextStyle(
+                                  '${formatWon(price)}원',
+                                  style: TextStyle(
                                     fontSize: 13,
                                     color: Colors.black54,
                                   ),
                                 ),
-                                const SizedBox(height: 6),
+                                SizedBox(height: 6),
 
                                 // 수량 조절: - [count] +
                                 // InkWell + Container 커스텀 버튼을 쓴 이유:
@@ -156,10 +156,12 @@ class CartSideSheet extends StatelessWidget {
                                       onTap: () => onDecrease(title),
                                     ),
                                     Padding(
-                                      padding: const EdgeInsets.symmetric(horizontal: 8),
+                                      padding: EdgeInsets.symmetric(
+                                        horizontal: 8,
+                                      ),
                                       child: Text(
                                         '$count',
-                                        style: const TextStyle(
+                                        style: TextStyle(
                                           fontSize: 15,
                                           fontWeight: FontWeight.bold,
                                         ),
@@ -182,7 +184,7 @@ class CartSideSheet extends StatelessWidget {
                             children: [
                               IconButton(
                                 onPressed: () => onRemove(title),
-                                icon: const Icon(
+                                icon: Icon(
                                   Icons.delete,
                                   color: Colors.redAccent,
                                 ),
@@ -190,8 +192,8 @@ class CartSideSheet extends StatelessWidget {
                               ),
                               // 단가 * 수량 = 소계
                               Text(
-                                '${_formatWon(price * count)}원',
-                                style: const TextStyle(
+                                '${formatWon(price * count)}원',
+                                style: TextStyle(
                                   fontWeight: FontWeight.bold,
                                   color: Colors.black87,
                                 ),
@@ -205,12 +207,12 @@ class CartSideSheet extends StatelessWidget {
                 ),
               ),
 
-              const SizedBox(height: 10),
+              SizedBox(height: 10),
 
               // 하단 결제 요약 영역
               Container(
-                padding: const EdgeInsets.only(top: 10),
-                decoration: const BoxDecoration(
+                padding: EdgeInsets.only(top: 10),
+                decoration: BoxDecoration(
                   border: Border(top: BorderSide(color: Colors.black12)),
                 ),
                 child: Column(
@@ -220,13 +222,13 @@ class CartSideSheet extends StatelessWidget {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        const Text(
+                        Text(
                           '총 결제 금액',
                           style: TextStyle(fontSize: 15, color: Colors.black54),
                         ),
                         Text(
-                          '${_formatWon(totalPrice)}원',
-                          style: const TextStyle(
+                          '${formatWon(totalPrice)}원',
+                          style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
                             color: accent,
@@ -234,25 +236,25 @@ class CartSideSheet extends StatelessWidget {
                         ),
                       ],
                     ),
-                    const SizedBox(height: 12),
+                    SizedBox(height: 12),
 
                     // 주문 버튼 (CTA).
                     ElevatedButton(
                       onPressed: () {
                         // 실제 주문 로직은 부모에서 수행.
                         // 여기서는 시각적 피드백만 간단히 표시.
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('주문하기 클릭됨')),
-                        );
+                        ScaffoldMessenger.of(
+                          context,
+                        ).showSnackBar(SnackBar(content: Text('주문하기 클릭됨')));
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: accent, // 브랜드 강조색
-                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        padding: EdgeInsets.symmetric(vertical: 14),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(8),
                         ),
                       ),
-                      child: Text('${_formatWon(totalPrice)}원 주문하기'),
+                      child: Text('${formatWon(totalPrice)}원 주문하기'),
                     ),
                   ],
                 ),
@@ -262,19 +264,6 @@ class CartSideSheet extends StatelessWidget {
         ),
       ),
     );
-  }
-
-  /// 간단한 숫자 포맷터 (천단위 콤마)
-  // → intl 패키지 없이 빠르게 처리, 의존성 최소화.
-  String _formatWon(int v) {
-    final s = v.toString();
-    final b = StringBuffer();
-    for (int i = 0; i < s.length; i++) {
-      final r = s.length - i;
-      b.write(s[i]);
-      if (i != s.length - 1 && (r - 1) % 3 == 0) b.write(',');
-    }
-    return b.toString();
   }
 }
 

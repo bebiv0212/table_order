@@ -52,11 +52,12 @@ class _CustomerLoginScreenState extends State<CustomerLoginScreen> {
         final pw = _password.text.trim();
         final table = _tableNum.text.trim();
 
+        // ✅ context로부터 필요한 객체들을 await 전에 미리 가져오기
+        final messenger = ScaffoldMessenger.of(context);
+        final navigator = Navigator.of(context);
+
         if (email.isEmpty || pw.isEmpty || table.isEmpty) {
-          if (!mounted) return; // ✅ context 사용 전 검사
-          ScaffoldMessenger.of(
-            context,
-          ).showSnackBar(const SnackBar(content: Text('모든 항목을 입력해주세요.')));
+          messenger.showSnackBar(SnackBar(content: Text('모든 항목을 입력해주세요.')));
           return;
         }
 
@@ -68,17 +69,18 @@ class _CustomerLoginScreenState extends State<CustomerLoginScreen> {
             password: pw,
           );
 
-          if (!mounted) return; // ✅ context 안전 체크
+          if (!context.mounted) return; // await 뒤 context 사용 전 확인
+
           final uid = cred.user!.uid;
           final db = FirebaseFirestore.instance;
 
           // 2️⃣ 관리자 확인
           final adminDoc = await db.collection('admins').doc(uid).get();
-          if (!mounted) return; // ✅ context 사용 전 검사
+
+          if (!context.mounted) return;
+
           if (!adminDoc.exists) {
-            ScaffoldMessenger.of(
-              context,
-            ).showSnackBar(const SnackBar(content: Text('관리자 계정이 아닙니다.')));
+            messenger.showSnackBar(SnackBar(content: Text('관리자 계정이 아닙니다.')));
             await FirebaseAuth.instance.signOut();
             setState(() => _loading = false);
             return;
@@ -92,6 +94,7 @@ class _CustomerLoginScreenState extends State<CustomerLoginScreen> {
               .doc(uid)
               .collection('tables')
               .doc(table);
+
           await tableRef.set({
             'tableNumber': table,
             'status': 'idle',
@@ -99,10 +102,10 @@ class _CustomerLoginScreenState extends State<CustomerLoginScreen> {
             'createdAt': FieldValue.serverTimestamp(),
           }, SetOptions(merge: true));
 
-          if (!mounted) return; // ✅ context 안전
-          // 4️⃣ 고객 메뉴 화면으로 이동
-          Navigator.pushReplacement(
-            context,
+          if (!context.mounted) return;
+
+          // 4️⃣ 화면 이동 — 미리 가져온 navigator 사용
+          navigator.pushReplacement(
             MaterialPageRoute(
               builder: (_) => CustomerMenuScreen(
                 adminUid: uid,
@@ -112,10 +115,10 @@ class _CustomerLoginScreenState extends State<CustomerLoginScreen> {
             ),
           );
         } on FirebaseAuthException catch (e) {
-          if (!mounted) return; // ✅ context 검사
-          ScaffoldMessenger.of(
-            context,
-          ).showSnackBar(SnackBar(content: Text(e.message ?? '로그인 실패')));
+          if (!context.mounted) return;
+          messenger.showSnackBar(
+            SnackBar(content: Text(e.message ?? '로그인 실패')),
+          );
         } finally {
           if (mounted) setState(() => _loading = false);
         }

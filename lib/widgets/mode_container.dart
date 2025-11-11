@@ -32,7 +32,7 @@ class ModeContainer extends StatelessWidget {
         borderRadius: BorderRadius.circular(20),
       ),
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 40),
+        padding: EdgeInsets.symmetric(horizontal: 30, vertical: 40),
         child: Column(
           spacing: 15,
           mainAxisAlignment: MainAxisAlignment.center,
@@ -48,14 +48,14 @@ class ModeContainer extends StatelessWidget {
             ),
             Text(
               modeTitle,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 30, //
                 fontWeight: FontWeight.w300,
               ),
             ),
             Text(
               description, //
-              style: const TextStyle(fontSize: 20),
+              style: TextStyle(fontSize: 20),
             ),
             Row(
               children: [
