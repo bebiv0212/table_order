@@ -7,6 +7,18 @@ import 'package:table_order/screens/customer_screen/widget/menu_detail_card.dart
 import 'package:table_order/screens/customer_screen/widget/menu_item_card.dart';
 import 'package:table_order/screens/customer_screen/widget/side_category_selector.dart';
 
+
+//class CustomerMenuScreen extends StatelessWidget {
+//  final String shopName; // ✅ 추가: 매장명
+//  final String tableNumber; // ✅ 추가: 테이블 번호
+
+//  const CustomerMenuScreen({
+//    super.key,
+//    required this.shopName,
+//    required this.tableNumber,
+//    required String adminUid,
+//  });
+
 /// 고객용 주문 화면의 메인 페이지.
 ///
 ///
@@ -94,8 +106,8 @@ class _CustomerMenuScreenState extends State<CustomerMenuScreen> {
 
       // 상단 앱 바
       appBar: CustomAppBar(
-        storeName: '맛있는 식당',
-        description: '01',
+        storeName: shopName, // ✅ 로그인에서 전달받은 매장명
+        description: '테이블 $tableNumber', // ✅ 로그인에서 전달받은 테이블 번호
         actionBtn1: AppbarActionBtn(
           icon: LucideIcons.receiptText,
           title: '주문내역',
