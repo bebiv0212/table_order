@@ -146,11 +146,11 @@ class CustomerMenuScreen extends StatelessWidget {
                       tagText: item['tag'],
                       count: current,
                       onIncrease: () => cart.addItem(item),
-                      onDecrease: () => cart.decreaseItem(item['title']),
+                      onDecrease: () => cart.decreaseItem(item),
                       onTap: () {
                         showDialog(
                           context: context,
-                          builder: (_) => MenuDetailDialog(
+                          builder: (_) => MenuDetailCard(
                             title: item['title'],
                             subtitle: item['subtitle'],
                             price: item['price'],
@@ -252,7 +252,7 @@ class CustomerMenuScreen extends StatelessWidget {
                       );
                     },
                     icon: Icon(
-                      Icons.shopping_cart_outlined,
+                      LucideIcons.shoppingCart,
                       color: Colors.white,
                     ),
                     label: Text('장바구니 보기'),

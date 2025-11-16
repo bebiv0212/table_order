@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:table_order/theme/app_colors.dart';
 import 'package:table_order/utlis/format_utils.dart';
 
@@ -68,8 +69,7 @@ class MenuItemCard extends StatelessWidget {
                   // errorBuilder: 이미지 로드 실패 대비
                   errorBuilder: (_, __, ___) => Container(
                     color: Colors.grey[200],
-                    child: Icon(
-                      Icons.broken_image,
+                    child: const Icon(LucideIcons.imageOff,
                       size: 36,
                       color: Colors.black45,
                     ),
@@ -157,9 +157,8 @@ class MenuItemCard extends StatelessWidget {
                         height: 32,
                         child: ElevatedButton.icon(
                           onPressed: onIncrease, // 최초 클릭 시 1개 담기
-                          icon: Icon(Icons.add, size: 14),
+                          icon: const Icon(LucideIcons.plus,size: 14),
                           label: Text('담기', style: TextStyle(fontSize: 13)),
-
                           // - 담기는 첫 액션(Primary Action) → 강조 필요, OutlinedButton이나 TextButton보다 명확한 CTA, elevation=0으로 납작하게 만들어 too-heavy 느낌 방지.
                           style: ElevatedButton.styleFrom(
                             backgroundColor: AppColors.customerPrimary,
@@ -186,7 +185,7 @@ class MenuItemCard extends StatelessWidget {
                           children: [
                             // - 버튼
                             IconButton(
-                              icon: Icon(Icons.remove, size: 18),
+                              icon: Icon(LucideIcons.minus, size: 18),
                               // IconButton을 쓴 이유:
                               // • 터치 영역 자동 확보(48dp)
                               // • InkWell보다 간단하게 ripple 및 hover 처리
@@ -205,7 +204,7 @@ class MenuItemCard extends StatelessWidget {
                             // + 버튼
                             IconButton(
                               icon: Icon(
-                                Icons.add,
+                                LucideIcons.plus,
                                 color: AppColors.customerPrimary,
                                 size: 18,
                               ),

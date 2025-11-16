@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:provider/provider.dart';
 import 'package:table_order/providers/menu_count_provider.dart';
 import 'package:table_order/theme/app_colors.dart';
 import 'package:table_order/utlis/format_utils.dart';
 
 /// 메뉴 상세 다이얼로그 (Provider 기반 Stateless 버전)
-class MenuDetailDialog extends StatelessWidget {
+class MenuDetailCard extends StatelessWidget {
   final String title;
   final String subtitle;
   final int price;
@@ -14,7 +15,7 @@ class MenuDetailDialog extends StatelessWidget {
   final void Function(String title, int price, int count)? onAddToCart;
   final int initialCount;
 
-  const MenuDetailDialog({
+  const MenuDetailCard({
     super.key,
     required this.title,
     required this.subtitle,
@@ -57,7 +58,7 @@ class MenuDetailDialog extends StatelessWidget {
                       fit: BoxFit.cover,
                       errorBuilder: (_, __, ___) => SizedBox(
                         height: 160,
-                        child: Center(child: Icon(Icons.broken_image)),
+                        child: Center(child: Icon(LucideIcons.imageOff)),
                       ),
                     ),
                   ),
@@ -108,7 +109,7 @@ class MenuDetailDialog extends StatelessWidget {
                               ),
                             ),
                             IconButton(
-                              icon: Icon(Icons.close),
+                              icon: Icon(LucideIcons.x),
                               onPressed: () => Navigator.pop(context),
                             ),
                           ],
@@ -144,7 +145,7 @@ class MenuDetailDialog extends StatelessWidget {
                               child: Row(
                                 children: [
                                   IconButton(
-                                    icon: Icon(Icons.remove, size: 20),
+                                    icon: Icon(LucideIcons.minus, size: 20),
                                     onPressed: countProvider.decrease,
                                   ),
                                   Text(
@@ -153,7 +154,7 @@ class MenuDetailDialog extends StatelessWidget {
                                   ),
                                   IconButton(
                                     icon: Icon(
-                                      Icons.add,
+                                      LucideIcons.plus,
                                       color: AppColors.customerPrimary,
                                       size: 20,
                                     ),
