@@ -10,7 +10,8 @@ import 'package:table_order/providers/order_provider.dart';
 import 'package:table_order/enum/order_status.dart';
 
 class AdminOrderMScreen extends StatelessWidget {
-  const AdminOrderMScreen({super.key});
+  final String shopName;
+  const AdminOrderMScreen({super.key, required this.shopName});
 
   @override
   Widget build(BuildContext context) {

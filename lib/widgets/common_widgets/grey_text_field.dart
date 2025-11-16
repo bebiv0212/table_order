@@ -6,15 +6,18 @@ class GreyTextField extends StatelessWidget {
     required this.label,
     required this.hint,
     required this.obscure,
+    this.controller,
   });
 
   final String label;
   final String hint;
   final bool obscure;
+  final TextEditingController? controller;
 
   @override
   Widget build(BuildContext context) {
     return TextField(
+      controller: controller,
       obscureText: obscure,
       decoration: InputDecoration(
         labelText: label,

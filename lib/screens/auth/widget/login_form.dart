@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:table_order/theme/app_colors.dart';
 import 'package:table_order/widgets/common_widgets/rounded_rec_button.dart';
 
-class LoginBaseForm extends StatelessWidget {
-  const LoginBaseForm({
+class LoginForm extends StatelessWidget {
+  const LoginForm({
     super.key,
     required this.mode,
     required this.title,
@@ -34,11 +34,11 @@ class LoginBaseForm extends StatelessWidget {
       body: Center(
         child: Container(
           width: 420,
-          padding: const EdgeInsets.symmetric(vertical: 50, horizontal: 40),
+          padding: EdgeInsets.symmetric(vertical: 50, horizontal: 40),
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(20),
-            boxShadow: const [
+            boxShadow: [
               BoxShadow(
                 color: Colors.black12,
                 blurRadius: 10,
@@ -61,14 +61,11 @@ class LoginBaseForm extends StatelessWidget {
                 ),
                 Text(
                   title,
-                  style: const TextStyle(
-                    fontSize: 22,
-                    fontWeight: FontWeight.w600,
-                  ),
+                  style: TextStyle(fontSize: 22, fontWeight: FontWeight.w600),
                 ),
                 Text(
                   subtitle,
-                  style: const TextStyle(fontSize: 16, color: Colors.black54),
+                  style: TextStyle(fontSize: 16, color: Colors.black54),
                   textAlign: TextAlign.center,
                 ),
                 ...fields,

@@ -19,8 +19,8 @@ class RoundedRecButton extends StatelessWidget {
     return ElevatedButton(
       style: ElevatedButton.styleFrom(
         elevation: 0,
-        textStyle: const TextStyle(fontSize: 18),
-        padding: const EdgeInsets.all(10),
+        textStyle: TextStyle(fontSize: 18),
+        padding: EdgeInsets.all(10),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
         backgroundColor: bgColor,
         foregroundColor: fgColor,
