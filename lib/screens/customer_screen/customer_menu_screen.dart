@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:provider/provider.dart';
+import 'package:table_order/screens/customer_screen/order_history_screen.dart';
 import 'package:table_order/screens/customer_screen/widget/cart_side_sheet.dart';
+import 'package:table_order/screens/customer_screen/widget/staff_call_dialog.dart';
+import 'package:table_order/services/order_service.dart';
 import 'package:table_order/utlis/format_utils.dart';
 import 'package:table_order/widgets/common_widgets/appbar_action_btn.dart';
 import 'package:table_order/widgets/common_widgets/custom_appbar.dart';
@@ -27,6 +30,7 @@ class CustomerMenuScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final category = context.watch<CategoryProvider>().selected;
     final cart = context.watch<CartProvider>();
+    final orderService = OrderService();
 
     final List<Map<String, dynamic>> menuItems = [
       {
@@ -51,7 +55,7 @@ class CustomerMenuScreen extends StatelessWidget {
         'price': 8500,
         'tag': '메인',
         'imageUrl':
-            'https://images.unsplash.com/photo-1601050690597-3b4c1cfbff1d?q=80&w=1600',
+            'https://images.unsplash.com/photo-1550304943-4f24f54ddde9?q=80&w=1600',
       },
       {
         'title': '티라미수 케이크',
@@ -59,7 +63,7 @@ class CustomerMenuScreen extends StatelessWidget {
         'price': 6000,
         'tag': '디저트',
         'imageUrl':
-            'https://images.unsplash.com/photo-1627308595187-94aef2707ba0?q=80&w=1600',
+            'https://images.unsplash.com/photo-1550304943-4f24f54ddde9?q=80&w=1600',
       },
     ];
 
@@ -77,6 +81,17 @@ class CustomerMenuScreen extends StatelessWidget {
         actionBtn1: AppbarActionBtn(
           icon: LucideIcons.receiptText,
           title: '주문내역',
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => OrderHistoryScreen(
+                  adminUid: adminUid,
+                  tableNumber: tableNumber,
+                ),
+              ),
+            );
+          },
         ),
       ),
       body: Stack(
@@ -88,6 +103,20 @@ class CustomerMenuScreen extends StatelessWidget {
                 selectedCategory: category,
                 onCategorySelected: (cat) =>
                     context.read<CategoryProvider>().select(cat),
+                onCallStaff: () {
+                  showDialog(
+                    context: context,
+                    barrierDismissible: true,
+                    builder: (_) => StaffCallDialog(
+                      onSelect: (type) {
+                        print("직원 호출: $type");
+
+                        // TODO: Firestore에 'staffCall' 컬렉션으로 저장하기
+                        Navigator.pop(context);
+                      },
+                    ),
+                  );
+                },
               ),
               Expanded(
                 child: GridView.builder(
@@ -173,7 +202,37 @@ class CustomerMenuScreen extends StatelessWidget {
                         barrierDismissible: true,
                         barrierLabel: '',
                         transitionDuration: const Duration(milliseconds: 300),
-                        pageBuilder: (_, __, ___) => CartSideSheet(),
+                        pageBuilder: (_, __, ___) => CartSideSheet(
+                          cartItems: cart.items,
+                          totalPrice: cart.totalPrice,
+                          onIncrease: (title) => cart.addItem(
+                            cart.items.firstWhere((e) => e['title'] == title),
+                          ),
+                          onDecrease: cart.decreaseItem,
+                          onRemove: cart.removeItem,
+                          onOrder: () async {
+                            if (cart.items.isEmpty) return;
+
+                            // 1) Firestore에 주문 저장
+                            await orderService.submitOrder(
+                              adminUid: adminUid,
+                              tableNumber: tableNumber,
+                              cartItems: cart.items,
+                              totalPrice: cart.totalPrice,
+                            );
+
+                            // 2) 장바구니 내용 초기화
+                            cart.clear();
+
+                            // 3) 장바구니 창 닫기
+                            Navigator.pop(context);
+
+                            // 4) 사용자 안내
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text("주문이 접수되었습니다!")),
+                            );
+                          },
+                        ),
                         transitionBuilder: (_, anim, __, child) {
                           final offset =
                               Tween(

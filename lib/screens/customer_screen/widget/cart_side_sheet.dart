@@ -105,13 +105,7 @@ class CartSideSheet extends StatelessWidget {
 
                     // 주문 버튼
                     ElevatedButton(
-                      onPressed: () {
-                        // 실제 주문 로직은 부모에서 수행.
-                        // 여기서는 시각적 피드백만 간단히 표시.
-                        ScaffoldMessenger.of(
-                          context,
-                        ).showSnackBar(SnackBar(content: Text('주문하기 클릭됨')));
-                      },
+                      onPressed: onOrder,
                       style: ElevatedButton.styleFrom(
                         backgroundColor: accent, // 브랜드 강조색
                         padding: EdgeInsets.symmetric(vertical: 14),
