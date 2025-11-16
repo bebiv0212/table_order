@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:table_order/providers/category_provider.dart';
 import 'package:table_order/theme/app_colors.dart';
 import 'package:table_order/widgets/common_widgets/rounded_rec_button.dart';
 
@@ -7,22 +9,18 @@ class SideCategorySelector extends StatelessWidget {
   /// 표시할 카테고리 목록 (ex. ['전체', '메인', '음료', '디저트'])
   final List<String> categories;
 
-  /// 현재 선택된 카테고리 (부모에서 관리)
-  final String selectedCategory;
-
-  /// 사용자가 특정 카테고리를 탭했을 때 실행되는 콜백
-  final ValueChanged<String> onCategorySelected;
-
   const SideCategorySelector({
     super.key,
-    required this.categories,
-    required this.selectedCategory,
-    required this.onCategorySelected,
+    required this.categories, required String selectedCategory, required void Function(dynamic cat) onCategorySelected,
   });
 
   @override
   Widget build(BuildContext context) {
     final double itemHeight = 44.0;
+
+    // Provider에서 현재 선택된 카테고리 가져오기
+    final categoryProvider = context.watch<CategoryProvider>();
+    final selectedCategory = categoryProvider.selected;
 
     return Container(
       width: 150,
@@ -49,7 +47,10 @@ class SideCategorySelector extends StatelessWidget {
                 width: double.infinity,
                 child: RoundedRecButton(
                   text: cat,
-                  onPressed: () => onCategorySelected(cat),
+                  onPressed: () {
+                    // Provider state update
+                    categoryProvider.select(cat);
+                  },
                   bgColor: Colors.transparent, // 버튼 배경 제거 (애니메이션은 바깥에서)
                   fgColor: isSelected
                       ? Colors.white
