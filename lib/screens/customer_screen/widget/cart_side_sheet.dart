@@ -11,15 +11,14 @@ import 'package:table_order/utlis/format_utils.dart';
 /// - 상태는 부모에서 관리(state lifting) → CartSideSheet는 오직 ‘표시 + 이벤트 전달’만 담당.
 /// - 전체를 StatelessWidget으로 둬서 매번 rebuild해도 부하가 적음(데이터만 주입받음).
 class CartSideSheet extends StatelessWidget {
-  const CartSideSheet({
-    super.key,
-  });
-  
+  const CartSideSheet({super.key, required this.onOrder});
+
+  final VoidCallback onOrder;
+
   @override
   Widget build(BuildContext context) {
     // CartProvider로부터 현재 장바구니 상태 조회
     final cart = context.watch<CartProvider>();
-    final cartItems = cart.items;
     final totalPrice = cart.totalPrice;
     // 포인트 컬러
     // 한 곳에서만 변경하면 전체 스타일이 바뀌게 하기 위해 const로 고정.
@@ -39,10 +38,7 @@ class CartSideSheet extends StatelessWidget {
         child: Container(
           // 패널 너비를 화면의 40%로 설정
           // 휴대폰은 0.9 정도로 조정 가능.
-          width: MediaQuery
-              .of(context)
-              .size
-              .width * 0.4,
+          width: MediaQuery.of(context).size.width * 0.4,
           height: double.infinity,
           padding: EdgeInsets.all(20), // 내부 패딩: 콘텐츠 간 간격 확보.
           child: Column(
@@ -67,10 +63,7 @@ class CartSideSheet extends StatelessWidget {
               SizedBox(height: 10),
 
               // 장바구니 리스트
-              Expanded(
-                child: CartCard(),
-              ),
-
+              Expanded(child: CartCard()),
 
               SizedBox(height: 10),
 

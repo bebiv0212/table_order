@@ -10,11 +10,11 @@ class SideCategorySelector extends StatelessWidget {
   final List<String> categories;
 
   final VoidCallback onCallStaff;
-  
+
   const SideCategorySelector({
     super.key,
-    required this.categories, 
-    required String selectedCategory, 
+    required this.categories,
+    required String selectedCategory,
     required void Function(dynamic cat) onCategorySelected,
     required this.onCallStaff,
   });
@@ -57,7 +57,9 @@ class SideCategorySelector extends StatelessWidget {
                       width: double.infinity,
                       child: RoundedRecButton(
                         text: cat,
-                        onPressed: () => onCategorySelected(cat),
+                        onPressed: () {
+                          categoryProvider.select(cat);
+                        },
                         bgColor: Colors.transparent, // 버튼 배경 제거 (애니메이션은 바깥에서)
                         fgColor: isSelected
                             ? Colors.white

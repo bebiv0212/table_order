@@ -203,16 +203,8 @@ class CustomerMenuScreen extends StatelessWidget {
                         barrierLabel: '',
                         transitionDuration: const Duration(milliseconds: 300),
                         pageBuilder: (_, __, ___) => CartSideSheet(
-                          cartItems: cart.items,
-                          totalPrice: cart.totalPrice,
-                          onIncrease: (title) => cart.addItem(
-                            cart.items.firstWhere((e) => e['title'] == title),
-                          ),
-                          onDecrease: cart.decreaseItem,
-                          onRemove: cart.removeItem,
                           onOrder: () async {
                             if (cart.items.isEmpty) return;
-
                             // 1) Firestore에 주문 저장
                             await orderService.submitOrder(
                               adminUid: adminUid,
@@ -251,10 +243,7 @@ class CustomerMenuScreen extends StatelessWidget {
                         },
                       );
                     },
-                    icon: Icon(
-                      LucideIcons.shoppingCart,
-                      color: Colors.white,
-                    ),
+                    icon: Icon(LucideIcons.shoppingCart, color: Colors.white),
                     label: Text('장바구니 보기'),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Color(0xFFE8751A),

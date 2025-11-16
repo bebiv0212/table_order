@@ -30,10 +30,12 @@ class AdminOrderMScreen extends StatelessWidget {
               actionBtn1: AppbarActionBtn(
                 icon: LucideIcons.receiptText,
                 title: '메뉴관리',
+                onPressed: () {},
               ),
               actionBtn2: AppbarActionBtn(
                 icon: LucideIcons.messageSquare,
                 title: '리뷰관리',
+                onPressed: () {},
               ),
             ),
 
@@ -41,18 +43,14 @@ class AdminOrderMScreen extends StatelessWidget {
             floatingActionButton: FloatingActionButton(
               onPressed: () {
                 final prov = context.read<OrderProvider>();
-                prov.addOrder(
-                  "T3",
-                  "김치찌개 x 1, 불고기 x 2",
-                  prov.selectedStatus,
-                );
+                prov.addOrder("T3", "김치찌개 x 1, 불고기 x 2", prov.selectedStatus);
               },
               child: Icon(Icons.add),
             ),
 
             body: SafeArea(
               child: SingleChildScrollView(
-                padding: EdgeInsets.all(30),
+                padding: EdgeInsets.fromLTRB(20, 20, 20, 10),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -64,25 +62,25 @@ class AdminOrderMScreen extends StatelessWidget {
                         Expanded(
                           child: AdminStateCard(
                             title: "전체 주문",
-                            order_count: "${provider.totalCount}건",
+                            orderCount: "${provider.totalCount}건",
                           ),
                         ),
                         Expanded(
                           child: AdminStateCard(
                             title: "진행중",
-                            order_count: "${provider.progressCount}건",
+                            orderCount: "${provider.progressCount}건",
                           ),
                         ),
                         Expanded(
                           child: AdminStateCard(
                             title: "완료",
-                            order_count: "${provider.doneCount}건",
+                            orderCount: "${provider.doneCount}건",
                           ),
                         ),
                         Expanded(
                           child: AdminStateCard(
                             title: "결제완료",
-                            order_count: "${provider.paidCount}건",
+                            orderCount: "${provider.paidCount}건",
                           ),
                         ),
                       ],
@@ -103,7 +101,9 @@ class AdminOrderMScreen extends StatelessWidget {
                               margin: EdgeInsets.only(right: 8),
                               alignment: Alignment.center,
                               decoration: BoxDecoration(
-                                color: selected ? Colors.white : Colors.grey[200],
+                                color: selected
+                                    ? Colors.white
+                                    : Colors.grey[200],
                                 borderRadius: BorderRadius.circular(20),
                                 border: Border.all(
                                   color: selected
@@ -112,12 +112,17 @@ class AdminOrderMScreen extends StatelessWidget {
                                 ),
                                 boxShadow: selected
                                     ? [
-                                  BoxShadow(
-                                    color: Color.fromRGBO(158, 158, 158, 0.2),
-                                    blurRadius: 4,
-                                    offset: Offset(0, 2),
-                                  )
-                                ]
+                                        BoxShadow(
+                                          color: Color.fromRGBO(
+                                            158,
+                                            158,
+                                            158,
+                                            0.2,
+                                          ),
+                                          blurRadius: 4,
+                                          offset: Offset(0, 2),
+                                        ),
+                                      ]
                                     : [],
                               ),
                               child: Text(
@@ -126,8 +131,9 @@ class AdminOrderMScreen extends StatelessWidget {
                                   color: selected
                                       ? Colors.black
                                       : Colors.grey[600],
-                                  fontWeight:
-                                  selected ? FontWeight.w600 : FontWeight.w400,
+                                  fontWeight: selected
+                                      ? FontWeight.w600
+                                      : FontWeight.w400,
                                 ),
                               ),
                             ),
@@ -142,8 +148,7 @@ class AdminOrderMScreen extends StatelessWidget {
                     GridView.builder(
                       shrinkWrap: true,
                       physics: NeverScrollableScrollPhysics(),
-                      gridDelegate:
-                      SliverGridDelegateWithFixedCrossAxisCount(
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                         crossAxisCount: 3,
                         mainAxisSpacing: 16,
                         crossAxisSpacing: 16,
@@ -154,18 +159,22 @@ class AdminOrderMScreen extends StatelessWidget {
                         final orderItem = provider.filteredOrders[index];
                         final sampleLists = List.generate(
                           3,
-                              (i) => OrderList(
-                            time: "오후 ${6 + i}:0$i",       // 더미데이터
-                            price: "${23000 + i * 1000}원",  // 더미데이터
-                            menu: "된장찌개 × 1, 불고기 × 1",  // 더미데이터
-                            onProcess: () {debugPrint("주문완료 버튼 클릭");},
-                            onPaid: () {debugPrint("결제완료 버튼 클릭");},
+                          (i) => OrderList(
+                            time: "오후 ${6 + i}:0$i", // 더미데이터
+                            price: "${23000 + i * 1000}원", // 더미데이터
+                            menu: "된장찌개 × 1, 불고기 × 1", // 더미데이터
+                            onProcess: () {
+                              debugPrint("주문완료 버튼 클릭");
+                            },
+                            onPaid: () {
+                              debugPrint("결제완료 버튼 클릭");
+                            },
                           ),
                         );
 
                         return OrderCard(
                           tableName: "테이블 ${orderItem.tableName}",
-                          summary: "${sampleLists.length}건 · 64,000원",  // 가격 임시
+                          summary: "${sampleLists.length}건 · 64,000원", // 가격 임시
                           status: orderItem.status,
                           onDelete: () => provider.deleteOrder(orderItem.id),
                           orderLists: sampleLists,

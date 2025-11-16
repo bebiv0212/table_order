@@ -1,15 +1,14 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class AdminStateCard extends StatelessWidget {
   const AdminStateCard({
     super.key,
     required this.title,
-    required this.order_count,
+    required this.orderCount,
   });
 
   final String title;
-  final String order_count;
+  final String orderCount;
 
   @override
   Widget build(BuildContext context) {
@@ -20,10 +19,7 @@ class AdminStateCard extends StatelessWidget {
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(15),
         color: Colors.white,
-        border: Border.all(
-          color: Colors.grey,
-          width: 1
-        )
+        border: Border.all(color: Colors.grey, width: 1),
       ),
       child: Padding(
         padding: EdgeInsets.symmetric(horizontal: 20),
@@ -32,8 +28,8 @@ class AdminStateCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           spacing: 10,
           children: [
-            Text(title, style: TextStyle(fontSize: 30,color: Colors.grey)),
-            Text(order_count, style: TextStyle(fontSize: 30)),
+            Text(title, style: TextStyle(fontSize: 30, color: Colors.grey)),
+            Text(orderCount, style: TextStyle(fontSize: 30)),
           ],
         ),
       ),
