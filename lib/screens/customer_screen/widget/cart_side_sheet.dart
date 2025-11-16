@@ -14,6 +14,7 @@ class CartSideSheet extends StatelessWidget {
     required this.onDecrease,
     required this.onRemove,
     required this.totalPrice,
+    required this.onOrder,
   });
 
   /// 부모에서 전달받은 장바구니 아이템 목록
@@ -32,6 +33,8 @@ class CartSideSheet extends StatelessWidget {
 
   /// 총 결제 금액
   final int totalPrice;
+
+  final VoidCallback onOrder;
 
   @override
   Widget build(BuildContext context) {
@@ -240,13 +243,7 @@ class CartSideSheet extends StatelessWidget {
 
                     // 주문 버튼 (CTA).
                     ElevatedButton(
-                      onPressed: () {
-                        // 실제 주문 로직은 부모에서 수행.
-                        // 여기서는 시각적 피드백만 간단히 표시.
-                        ScaffoldMessenger.of(
-                          context,
-                        ).showSnackBar(SnackBar(content: Text('주문하기 클릭됨')));
-                      },
+                      onPressed: onOrder,
                       style: ElevatedButton.styleFrom(
                         backgroundColor: accent, // 브랜드 강조색
                         padding: EdgeInsets.symmetric(vertical: 14),

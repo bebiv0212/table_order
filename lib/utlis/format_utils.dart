@@ -11,3 +11,14 @@ String formatWon(int value) {
   }
   return b.toString();
 }
+
+String formatTime(DateTime dt) {
+  final hour = dt.hour;
+  final minute = dt.minute;
+
+  final isPm = hour >= 12;
+  final h12 = hour == 0 ? 12 : (hour > 12 ? hour - 12 : hour);
+  final ampm = isPm ? '오후' : '오전';
+
+  return '$ampm ${h12.toString().padLeft(2, '0')}:${minute.toString().padLeft(2, '0')}';
+}

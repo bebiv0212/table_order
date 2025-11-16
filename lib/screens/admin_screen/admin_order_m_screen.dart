@@ -17,10 +17,12 @@ class AdminOrderMScreen extends StatelessWidget {
         actionBtn1: AppbarActionBtn(
           icon: LucideIcons.receiptText,
           title: '메뉴관리',
+          onPressed: () {},
         ),
         actionBtn2: AppbarActionBtn(
           icon: LucideIcons.messageSquare,
           title: '리뷰관리',
+          onPressed: () {},
         ),
       ),
       body: SafeArea(child: Center(child: Text('주문 데이터 불러오는 중...'))),

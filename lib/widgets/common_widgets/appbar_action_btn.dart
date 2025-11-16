@@ -1,14 +1,20 @@
 import 'package:flutter/material.dart';
 
 class AppbarActionBtn extends StatelessWidget {
-  const AppbarActionBtn({super.key, required this.icon, required this.title});
+  const AppbarActionBtn({
+    super.key,
+    required this.icon,
+    required this.title,
+    required this.onPressed,
+  });
   final String title;
   final IconData icon;
+  final VoidCallback onPressed;
 
   @override
   Widget build(BuildContext context) {
     return OutlinedButton.icon(
-      onPressed: () {},
+      onPressed: onPressed,
       icon: Icon(icon, color: Colors.black, size: 18),
       label: Text(
         title,
