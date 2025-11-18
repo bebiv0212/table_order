@@ -13,26 +13,26 @@ dependencies:
 
   # 기본 UI
   cupertino_icons: ^1.0.8
-  flutter_svg: any
   cached_network_image: any # ✅ 고객 모드 이미지 캐싱/플레이스홀더
-  intl: any
+  intl: ^0.20.2
   lucide_icons_flutter: ^3.1.5
 
   # 상태관리
-  provider: any
+  provider: ^6.1.5+1
 
   # 로컬 저장
-  shared_preferences: any
+  shared_preferences: ^2.5.3
 
   # Firebase
   firebase_core: ^4.2.1
-  firebase_auth: any
-  cloud_firestore: any
-  firebase_storage: any # ✅ 관리자 업로드 / 고객 다운로드
+  firebase_auth: ^6.1.2
+  cloud_firestore: ^6.1.0
+  firebase_storage: ^13.0.4 # ✅ 관리자 업로드 / 고객 다운로드
 
-  # 로컬 이미지 선택 + 경로 접근
-  image_picker: any # ✅ 사장님이 태블릿 갤러리에서 선택
-  path_provider: any # ✅ 업로드 전 임시 저장 등
+  # 로컬 이미지 선택
+  image_picker: ^1.2.1 # ✅ 사장님이 태블릿 갤러리에서 선택
+
+  uuid: ^4.5.2
 
 dev_dependencies:
   flutter_test:

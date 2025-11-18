@@ -16,9 +16,8 @@ class OrderHistoryScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final ordersRef = FirebaseFirestore.instance
-        .collection('admins')
-        .doc(adminUid)
-        .collection('orders')
+        .collectionGroup('list')
+        .where('adminUid', isEqualTo: adminUid)
         .where('tableNumber', isEqualTo: tableNumber)
         .orderBy('createdAt', descending: true);
 

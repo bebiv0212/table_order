@@ -1,5 +1,6 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/date_symbol_data_local.dart';
 import 'package:provider/provider.dart';
 import 'package:table_order/firebase_options.dart';
 import 'package:table_order/providers/auth_provider.dart';
@@ -10,6 +11,8 @@ import 'package:table_order/screens/select_screen.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  await initializeDateFormatting('ko_KR', null);
 
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform, //

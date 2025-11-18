@@ -16,7 +16,7 @@ class AuthProvider extends ChangeNotifier {
 
   bool get isLoggedIn => _auth.currentUser != null;
 
-  // (기존) 회원가입 유지
+  // 회원가입
   Future<String?> signUpAdmin({
     required String shopName,
     required String email,
@@ -45,7 +45,7 @@ class AuthProvider extends ChangeNotifier {
     }
   }
 
-  // ✅ (신규) 관리자 로그인
+  //관리자 로그인
   Future<String?> signInAdmin({
     required String email,
     required String password,
@@ -87,6 +87,7 @@ class AuthProvider extends ChangeNotifier {
     }
   }
 
+  // 로그아웃
   Future<void> signOut() async {
     await _auth.signOut();
     _shopName = null; // 캐시 초기화
