@@ -26,7 +26,7 @@ class AdminMenuManageScreen extends StatelessWidget {
               .toList();
 
           return Scaffold(
-            backgroundColor: const Color(0xFFF8F8F8),
+            backgroundColor: Color(0xFFF8F8F8),
 
             appBar: AppBar(
               backgroundColor: Colors.white,
@@ -34,25 +34,25 @@ class AdminMenuManageScreen extends StatelessWidget {
               elevation: 0.5,
               toolbarHeight: 80,
               leading: IconButton(
-                icon: const Icon(LucideIcons.arrowLeft),
+                icon: Icon(LucideIcons.arrowLeft),
                 onPressed: () => Navigator.pop(context),
               ),
               title: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
+                  Text(
                     '메뉴 관리',
                     style: TextStyle(fontSize: 24, fontWeight: FontWeight.w600),
                   ),
                   Text(
                     '총 ${menus.length}개 메뉴',
-                    style: const TextStyle(color: Colors.black54, fontSize: 14),
+                    style: TextStyle(color: Colors.black54, fontSize: 14),
                   ),
                 ],
               ),
               actions: [
                 Padding(
-                  padding: const EdgeInsets.only(right: 16),
+                  padding: EdgeInsets.only(right: 16),
                   child: TextButton.icon(
                     onPressed: () async {
                       await Navigator.push(
@@ -73,24 +73,17 @@ class AdminMenuManageScreen extends StatelessWidget {
                       ),
                       backgroundColor: AppColors.adminPrimary,
                     ),
-                    icon: const Icon(
-                      LucideIcons.plus,
-                      size: 18,
-                      color: Colors.white,
-                    ),
-                    label: const Text(
-                      "메뉴 추가",
-                      style: TextStyle(color: Colors.white),
-                    ),
+                    icon: Icon(LucideIcons.plus, size: 18, color: Colors.white),
+                    label: Text("메뉴 추가", style: TextStyle(color: Colors.white)),
                   ),
                 ),
               ],
             ),
 
             body: prov.loading
-                ? const Center(child: CircularProgressIndicator())
+                ? Center(child: CircularProgressIndicator())
                 : SingleChildScrollView(
-                    padding: const EdgeInsets.all(20),
+                    padding: EdgeInsets.all(20),
                     child: Column(
                       children: categories.map((category) {
                         final list = menus.where((m) => m.category == category);
@@ -101,7 +94,7 @@ class AdminMenuManageScreen extends StatelessWidget {
                           children: [
                             Text(
                               category,
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 20,
                                 fontWeight: FontWeight.w700,
                               ),
@@ -109,22 +102,23 @@ class AdminMenuManageScreen extends StatelessWidget {
 
                             GridView.builder(
                               shrinkWrap: true,
-                              physics: const NeverScrollableScrollPhysics(),
+                              physics: NeverScrollableScrollPhysics(),
                               gridDelegate:
-                                  const SliverGridDelegateWithFixedCrossAxisCount(
+                                  SliverGridDelegateWithFixedCrossAxisCount(
                                     crossAxisCount: 3, // ← 가로 3칸
                                     mainAxisSpacing: 18,
                                     crossAxisSpacing: 18,
-                                    childAspectRatio: 1.89,
+                                    childAspectRatio: 1.7,
                                   ),
                               itemCount: list.length,
                               itemBuilder: (context, index) {
                                 final menu = list.elementAt(index);
 
                                 return MenuCard(
+                                  adminUid: adminUid,
                                   menu: menu,
                                   onDelete: () async {
-                                    await prov.deleteMenu(adminUid, menu.id!);
+                                    await prov.deleteMenu(adminUid, menu);
                                   },
                                   onEdit: () async {
                                     await Navigator.push(
@@ -135,6 +129,7 @@ class AdminMenuManageScreen extends StatelessWidget {
                                           child: MenuFormPage(
                                             adminUid: adminUid,
                                             isEdit: true,
+                                            menu: menu, // ← 기존 메뉴 전달
                                           ),
                                         ),
                                       ),

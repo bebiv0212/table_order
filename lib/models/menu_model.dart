@@ -39,4 +39,24 @@ class MenuModel {
       'isAvailable': isAvailable,
     };
   }
+
+  MenuModel copyWith({
+    String? id,
+    String? name,
+    int? price,
+    String? category,
+    String? description,
+    String? imageUrl,
+    bool? isAvailable,
+  }) {
+    return MenuModel(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      price: price ?? this.price,
+      category: category ?? this.category,
+      description: description ?? this.description,
+      imageUrl: imageUrl ?? this.imageUrl,
+      isAvailable: isAvailable ?? this.isAvailable,
+    );
+  }
 }

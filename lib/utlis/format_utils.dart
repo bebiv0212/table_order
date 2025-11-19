@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 final NumberFormat _wonFormatter = NumberFormat('#,###', 'ko_KR');
 final DateFormat _timeFormatter = DateFormat('a hh:mm', 'ko_KR');
 
+// 숫자 세자리마다 , 찍기
 String formatWon(int value) {
   return _wonFormatter.format(value);
 }

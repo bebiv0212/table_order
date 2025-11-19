@@ -8,14 +8,10 @@ import 'package:table_order/screens/auth/widget/login_form.dart';
 import 'package:table_order/theme/app_colors.dart';
 import 'package:table_order/widgets/common_widgets/grey_text_field.dart';
 
-class AdminLoginScreen extends StatefulWidget {
-  const AdminLoginScreen({super.key});
+class AdminLoginScreen extends StatelessWidget {
+  AdminLoginScreen({super.key});
 
-  @override
-  State<AdminLoginScreen> createState() => _AdminLoginScreenState();
-}
-
-class _AdminLoginScreenState extends State<AdminLoginScreen> {
+  // ✔ Stateless에서도 controller 사용 가능
   final _email = TextEditingController();
   final _password = TextEditingController();
 
@@ -46,13 +42,10 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
         final email = _email.text.trim();
         final pw = _password.text.trim();
 
-        // await 전 context 보관
         final messenger = ScaffoldMessenger.of(context);
         final navigator = Navigator.of(context);
 
         final err = await auth.signInAdmin(email: email, password: pw);
-
-        if (!mounted) return;
 
         if (err != null) {
           messenger.showSnackBar(SnackBar(content: Text(err)));
@@ -68,12 +61,5 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
       },
       submitText: auth.loading ? '로그인 중...' : '로그인',
     );
-  }
-
-  @override
-  void dispose() {
-    _email.dispose();
-    _password.dispose();
-    super.dispose();
   }
 }
