@@ -16,7 +16,6 @@ class OrderProvider with ChangeNotifier {
   // 더미 데이터용 Map (UI 표시용)
   final Map<String, List<String>> _ordersByStatus = {
     "테이블별": [],
-    "진행중": [],
     "완료": [],
     "결제완료": [],
   };
@@ -98,8 +97,6 @@ class OrderProvider with ChangeNotifier {
     switch (s) {
       case OrderStatus.table:
         return "테이블별";
-      case OrderStatus.progress:
-        return "진행중";
       case OrderStatus.done:
         return "완료";
       case OrderStatus.paid:
@@ -109,8 +106,6 @@ class OrderProvider with ChangeNotifier {
 
   // 카드 카운트
   int get totalCount => orders.length;
-  int get progressCount =>
-      orders.where((e) => e.status == OrderStatus.progress).length;
   int get doneCount => orders.where((e) => e.status == OrderStatus.done).length;
   int get paidCount => orders.where((e) => e.status == OrderStatus.paid).length;
 }

@@ -1,19 +1,25 @@
 import 'package:flutter/material.dart';
+import 'package:table_order/enum/order_status.dart';
+import 'package:table_order/theme/app_colors.dart';
 
 class OrderList extends StatelessWidget {
-  final String time; // 주문 시간
-  final String price; // 금액
-  final String menu; // 메뉴 요약
-  final VoidCallback onProcess; // 주문처리 완료
-  final VoidCallback onPaid; // 결제완료
+  final String id;
+  final String time;
+  final String price;
+  final String menu;
+  final VoidCallback onProcess;
+  final VoidCallback onPaid;
+  final OrderStatus currentStatus;
 
-  OrderList({
+  const OrderList({
     super.key,
+    required this.id,
     required this.time,
     required this.price,
     required this.menu,
     required this.onProcess,
     required this.onPaid,
+    required this.currentStatus,
   });
 
   @override
@@ -29,76 +35,57 @@ class OrderList extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // 상단: 시간 + 금액
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                time,
-                style: TextStyle(fontSize: 13, color: Colors.black54),
-              ),
-              Text(
-                price,
-                style: TextStyle(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w600,
-                  color: Colors.black87,
-                ),
-              ),
+              Text(time, style: TextStyle(fontSize: 13, color: Colors.black54)),
+              Text(price, style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
             ],
           ),
 
           SizedBox(height: 4),
 
-          // 메뉴 요약
-          Text(
-            menu,
-            style: TextStyle(fontSize: 13, color: Colors.black87),
-          ),
+          /// 메뉴 텍스트
+          Text(menu, style: TextStyle(fontSize: 13, color: Colors.black87)),
 
           SizedBox(height: 10),
 
-          // 주문처리, 결제완료 버튼
           Row(
             children: [
-              Expanded(
-                child: ElevatedButton(
-                  onPressed: onProcess,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Color(0xFFFF7A00),
-                    foregroundColor: Colors.white,
-                    padding: EdgeInsets.symmetric(vertical: 6),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(6),
+              // 테이블별에서만 표시
+              if (currentStatus == OrderStatus.table)
+                // 주문처리 완료 버튼
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: onProcess,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.adminPrimary,
+                      foregroundColor: Colors.white,
+                      padding: EdgeInsets.symmetric(vertical: 6),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
                     ),
-                  ),
-                  child: Text(
-                    "주문처리 완료",
-                    style: TextStyle(fontSize: 12, fontWeight: FontWeight.w500),
+                    child: Text("주문처리 완료", style: TextStyle(fontSize: 12)),
                   ),
                 ),
-              ),
+
               SizedBox(width: 8),
-              Expanded(
-                child: OutlinedButton(
-                  onPressed: onPaid,
-                  style: OutlinedButton.styleFrom(
-                    side: BorderSide(color: Colors.grey),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(6),
+
+              // 테이블별, 완료 에서만 결제완료 표시
+              if (currentStatus == OrderStatus.table ||
+                  currentStatus == OrderStatus.done)
+
+                // 결제완료 버튼
+                Expanded(
+                  child: OutlinedButton(
+                    onPressed: onPaid,
+                    style: OutlinedButton.styleFrom(
+                      side: BorderSide(color: AppColors.adminPrimary),
+                      padding: EdgeInsets.symmetric(vertical: 6),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
                     ),
-                    padding: EdgeInsets.symmetric(vertical: 6),
-                  ),
-                  child: Text(
-                    "결제완료",
-                    style: TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.black87,
-                    ),
+                    child: Text("결제완료", style: TextStyle(fontSize: 12, color: AppColors.adminPrimary)),
                   ),
                 ),
-              ),
             ],
           ),
         ],
