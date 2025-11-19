@@ -56,7 +56,7 @@ class EditableImagePickerBox extends StatelessWidget {
               child: Container(
                 padding: EdgeInsets.all(3),
                 decoration: BoxDecoration(
-                  color: Colors.black.withOpacity(0.5),
+                  color: Color.fromRGBO(0, 0, 0, 0.5),
                   shape: BoxShape.circle,
                 ),
                 child: Icon(Icons.close, size: 16, color: Colors.white),

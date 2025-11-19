@@ -7,7 +7,7 @@ class OrderList extends StatelessWidget {
   final VoidCallback onProcess; // 주문처리 완료
   final VoidCallback onPaid; // 결제완료
 
-  OrderList({
+  const OrderList({
     super.key,
     required this.time,
     required this.price,
@@ -33,10 +33,7 @@ class OrderList extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                time,
-                style: TextStyle(fontSize: 13, color: Colors.black54),
-              ),
+              Text(time, style: TextStyle(fontSize: 13, color: Colors.black54)),
               Text(
                 price,
                 style: TextStyle(
@@ -51,10 +48,7 @@ class OrderList extends StatelessWidget {
           SizedBox(height: 4),
 
           // 메뉴 요약
-          Text(
-            menu,
-            style: TextStyle(fontSize: 13, color: Colors.black87),
-          ),
+          Text(menu, style: TextStyle(fontSize: 13, color: Colors.black87)),
 
           SizedBox(height: 10),
 

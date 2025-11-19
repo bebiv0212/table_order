@@ -1,10 +1,13 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
+import 'package:provider/provider.dart';
 import 'package:table_order/models/menu_model.dart';
+import 'package:table_order/providers/menu_list_provider.dart';
 import 'package:table_order/theme/app_colors.dart';
 
 class MenuCard extends StatelessWidget {
+  final String adminUid;
   final MenuModel menu; // 이 카드가 표시할 메뉴 데이터
   final VoidCallback onEdit; // 수정 버튼 눌렀을 때 실행할 콜백
   final VoidCallback onDelete; // 삭제 버튼 눌렀을 때 실행할 콜백
@@ -14,6 +17,7 @@ class MenuCard extends StatelessWidget {
     required this.menu,
     required this.onEdit,
     required this.onDelete,
+    required this.adminUid,
   });
 
   @override
@@ -28,8 +32,9 @@ class MenuCard extends StatelessWidget {
           BoxShadow(color: Colors.black12, blurRadius: 6, offset: Offset(0, 2)),
         ],
       ),
-      padding: EdgeInsets.fromLTRB(14, 14, 14, 0), // 카드 안쪽 여백
+      padding: EdgeInsets.fromLTRB(14, 18, 14, 14), // 카드 안쪽 여백
       child: Column(
+        spacing: 5,
         children: [
           Row(
             spacing: 14,
@@ -54,7 +59,7 @@ class MenuCard extends StatelessWidget {
                     // 메뉴 이름
                     Text(
                       menu.name,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
                       ),
@@ -63,10 +68,7 @@ class MenuCard extends StatelessWidget {
                     // 메뉴 설명 (한 줄만 보이게, 길면 ... 처리)
                     Text(
                       menu.description,
-                      style: const TextStyle(
-                        fontSize: 14,
-                        color: Colors.black54,
-                      ),
+                      style: TextStyle(fontSize: 14, color: Colors.black54),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
@@ -88,8 +90,13 @@ class MenuCard extends StatelessWidget {
                           activeTrackColor: AppColors.adminPrimary,
                           inactiveTrackColor: Colors.grey,
                           value: menu.isAvailable, // true면 스위치 ON
-                          onChanged: (_) {
-                            // TODO: 나중에 판매 상태 바꾸는 로직 연결
+                          onChanged: (value) {
+                            final prov = context.read<MenuListProvider>();
+                            prov.toggleAvailability(
+                              adminUid, // 또는 관리자의 uid
+                              menu,
+                              value,
+                            );
                           },
                         ),
                         Text("판매중"),
@@ -105,17 +112,33 @@ class MenuCard extends StatelessWidget {
             children: [
               // 수정 버튼
               Expanded(
-                child: TextButton.icon(
-                  onPressed: onEdit, // 상위에서 넘겨준 콜백 실행
-                  icon: const Icon(LucideIcons.pen),
-                  label: const Text("수정"),
+                child: OutlinedButton.icon(
+                  onPressed: onEdit,
+                  icon: Icon(LucideIcons.pen, size: 18, color: Colors.black87),
+                  label: Text("수정", style: TextStyle(color: Colors.black87)),
+                  style: OutlinedButton.styleFrom(
+                    side: BorderSide(color: Colors.grey.shade400, width: 1.2),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    padding: EdgeInsets.symmetric(vertical: 10),
+                  ),
                 ),
               ),
 
-              // 삭제 아이콘 버튼
-              IconButton(
-                onPressed: onDelete, // 상위에서 넘겨준 콜백 실행
-                icon: const Icon(LucideIcons.trash, color: Colors.red),
+              SizedBox(width: 10),
+
+              // 🔥 삭제 버튼 → OutlinedButton 적용
+              OutlinedButton(
+                onPressed: onDelete,
+                style: OutlinedButton.styleFrom(
+                  side: BorderSide(color: Colors.red.shade300, width: 1.2),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  padding: EdgeInsets.all(12),
+                ),
+                child: Icon(LucideIcons.trash, color: Colors.red),
               ),
             ],
           ),
