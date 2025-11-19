@@ -45,7 +45,7 @@ class AdminOrderMScreen extends StatelessWidget {
                     context,
                     MaterialPageRoute(
                       builder: (_) =>
-                          AdminMenuManageScreen(shopName: provider.shopName),
+                          AdminMenuManageScreen(adminUid: provider.adminUid),
                     ),
                   );
                 },

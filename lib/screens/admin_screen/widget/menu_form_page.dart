@@ -9,8 +9,9 @@ import 'package:table_order/providers/menu_form_provider.dart';
 
 class MenuFormPage extends StatelessWidget {
   final bool isEdit;
+  final String adminUid;
 
-  const MenuFormPage({super.key, this.isEdit = false});
+  const MenuFormPage({super.key, this.isEdit = false, required this.adminUid});
 
   @override
   Widget build(BuildContext context) {
@@ -18,143 +19,169 @@ class MenuFormPage extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: AppBar(
-        titleSpacing: 0,
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black87,
-        elevation: 0.5,
-        title: Text(
-          isEdit ? "메뉴 수정" : "메뉴 추가",
-          style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
-        ),
-        leading: IconButton(
-          icon: Icon(LucideIcons.arrowLeft),
-          onPressed: () => Navigator.pop(context),
-        ),
-      ),
-
       body: SafeArea(
         child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 100),
+          padding: EdgeInsets.symmetric(horizontal: 100, vertical: 24),
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            spacing: 20,
+            spacing: 10,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                isEdit ? "메뉴 정보를 수정하세요." : "새로운 메뉴를 추가하세요.",
-                style: TextStyle(
-                  fontSize: 30,
-                  fontWeight: FontWeight.w600,
-                  color: AppColors.adminPrimary,
+              // 🔙 상단 뒤로가기 + 제목 영역
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  IconButton(
+                    icon: Icon(LucideIcons.arrowLeft),
+                    onPressed: () => Navigator.pop(context),
+                  ),
+                  SizedBox(width: 12),
+                ],
+              ),
+
+              SizedBox(
+                width: double.infinity,
+                child: Center(
+                  child: Text(
+                    isEdit ? "메뉴 정보를 수정하세요." : "새로운 메뉴를 추가하세요.",
+                    style: TextStyle(
+                      fontSize: 40,
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.adminPrimary,
+                    ),
+                  ),
                 ),
               ),
-              Row(
-                spacing: 20,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // 📌 왼쪽 — 이미지 영역
-                  Expanded(
-                    flex: 5,
-                    child: EditableImagePickerBox(
-                      imageFile: prov.imageFile,
-                      imageUrl: prov.imageCtrl.text.isEmpty
-                          ? null
-                          : prov.imageCtrl.text,
-                      onPickImage: prov.pickImage,
-                      onRemoveImage: prov.removeImage,
+
+              // 📐 메인 레이아웃 (이미지 + 폼)
+              Expanded(
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // 왼쪽: 이미지 선택 영역
+                    Expanded(
+                      flex: 5,
+                      child: EditableImagePickerBox(
+                        imageFile: prov.imageFile,
+                        imageUrl: prov.imageCtrl.text.isEmpty
+                            ? null
+                            : prov.imageCtrl.text,
+                        onPickImage: prov.pickImage,
+                        onRemoveImage: prov.removeImage,
+                      ),
                     ),
-                  ),
 
-                  // 📌 오른쪽 — 입력 필드 영역
-                  Expanded(
-                    flex: 5,
-                    child: Column(
-                      spacing: 20,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Padding(
-                          padding: EdgeInsets.only(top: 7),
-                          child: GreyTextField(
-                            label: '메뉴명',
-                            hint: '김치찌개',
-                            obscure: false,
-                            controller: prov.nameCtrl,
-                          ),
-                        ),
+                    SizedBox(width: 24),
 
-                        GreyTextField(
-                          label: '가격',
-                          hint: '9000',
-                          obscure: false,
-                          controller: prov.priceCtrl,
-                          keyboardType: TextInputType.number,
-                        ),
-
-                        GreyTextField(
-                          label: '카테고리',
-                          hint: '메인, 음료, 디저트 등',
-                          obscure: false,
-                          controller: prov.categoryCtrl,
-                        ),
-
-                        GreyTextField(
-                          label: '설명 (선택)',
-                          hint: '메뉴 설명',
-                          obscure: false,
-                          controller: prov.descCtrl,
-                          maxLines: 4,
-                        ),
-
-                        Row(
+                    // 오른쪽: 텍스트 필드 + 스위치 + 버튼
+                    Expanded(
+                      flex: 5,
+                      child: SingleChildScrollView(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          spacing: 20,
                           children: [
-                            CupertinoSwitch(
-                              value: prov.isAvailable,
-                              onChanged: prov.toggle,
-                              activeTrackColor: AppColors.adminPrimary,
-                              inactiveTrackColor: Colors.grey,
+                            Padding(
+                              padding: EdgeInsets.only(top: 7),
+                              child: GreyTextField(
+                                label: '메뉴명',
+                                hint: '김치찌개',
+                                obscure: false,
+                                controller: prov.nameCtrl,
+                              ),
                             ),
-                            SizedBox(width: 8),
-                            Text("판매 가능"),
+
+                            GreyTextField(
+                              label: '가격',
+                              hint: '9000',
+                              obscure: false,
+                              controller: prov.priceCtrl,
+                              keyboardType: TextInputType.number,
+                            ),
+
+                            GreyTextField(
+                              label: '카테고리',
+                              hint: '메인, 음료, 디저트 등',
+                              obscure: false,
+                              controller: prov.categoryCtrl,
+                            ),
+
+                            GreyTextField(
+                              label: '설명 (선택)',
+                              hint: '메뉴 설명',
+                              obscure: false,
+                              controller: prov.descCtrl,
+                              maxLines: 4,
+                            ),
+
+                            Row(
+                              children: [
+                                CupertinoSwitch(
+                                  value: prov.isAvailable,
+                                  onChanged: prov.toggle,
+                                  activeTrackColor: AppColors.adminPrimary,
+                                  inactiveTrackColor: Colors.grey,
+                                ),
+                                SizedBox(width: 8),
+                                Text("판매 가능"),
+                              ],
+                            ),
+
+                            // 저장 버튼
+                            Padding(
+                              padding: EdgeInsets.symmetric(horizontal: 40),
+                              child: SizedBox(
+                                width: double.infinity,
+                                height: 50,
+                                child: TextButton.icon(
+                                  onPressed: () async {
+                                    final result = prov.submit(context);
+                                    if (result != null) {
+                                      // 🔥 Firebase 저장 실행
+                                      final success = await prov.saveToFirebase(
+                                        adminUid: adminUid,
+                                      );
+
+                                      if (success) {
+                                        Navigator.pop(context, result);
+                                      } else {
+                                        ScaffoldMessenger.of(
+                                          context,
+                                        ).showSnackBar(
+                                          SnackBar(
+                                            content: Text("저장 실패! 다시 시도해주세요."),
+                                          ),
+                                        );
+                                      }
+                                    }
+                                  },
+                                  icon: Icon(
+                                    LucideIcons.save,
+                                    size: 18,
+                                    color: Colors.white,
+                                  ),
+                                  label: Text(
+                                    isEdit ? "수정" : "추가",
+                                    style: TextStyle(color: Colors.white),
+                                  ),
+                                  style: TextButton.styleFrom(
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
+                                    backgroundColor: AppColors.adminPrimary,
+                                    padding: EdgeInsets.symmetric(
+                                      horizontal: 14,
+                                      vertical: 10,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
                           ],
                         ),
-                        Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 40),
-                          child: SizedBox(
-                            width: double.infinity,
-                            height: 50,
-                            child: TextButton.icon(
-                              onPressed: () {
-                                final result = prov.submit(context);
-                                if (result != null) {
-                                  Navigator.pop(context, result);
-                                }
-                              },
-                              icon: Icon(
-                                LucideIcons.save,
-                                size: 18,
-                                color: Colors.white,
-                              ),
-                              label: Text(
-                                isEdit ? "수정" : "추가",
-                                style: TextStyle(color: Colors.white),
-                              ),
-                              style: TextButton.styleFrom(
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                                backgroundColor: AppColors.adminPrimary,
-                                padding: EdgeInsets.symmetric(
-                                  horizontal: 14,
-                                  vertical: 10,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ],
           ),

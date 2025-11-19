@@ -1,6 +1,8 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:table_order/models/menu_model.dart';
+import 'package:table_order/services/menu_service.dart';
 
 class MenuFormResult {
   final String name;
@@ -76,5 +78,36 @@ class MenuFormProvider extends ChangeNotifier {
       imageUrl: imageCtrl.text.trim(),
       isAvailable: isAvailable,
     );
+  }
+
+  final _service = MenuService();
+
+  /// Firebase 저장 기능
+  Future<bool> saveToFirebase({required String adminUid}) async {
+    try {
+      String imageUrl = imageCtrl.text.trim();
+
+      if (imageFile != null) {
+        final uploadedUrl = await _service.uploadImage(imageFile!);
+        if (uploadedUrl != null) {
+          imageUrl = uploadedUrl;
+        }
+      }
+
+      final menu = MenuModel(
+        name: nameCtrl.text.trim(),
+        price: int.parse(priceCtrl.text.trim()),
+        category: categoryCtrl.text.trim(),
+        description: descCtrl.text.trim(),
+        imageUrl: imageUrl,
+        isAvailable: isAvailable,
+      );
+
+      await _service.addMenu(adminUid, menu);
+      return true;
+    } catch (e) {
+      debugPrint("Firebase Save Error: $e");
+      return false;
+    }
   }
 }
