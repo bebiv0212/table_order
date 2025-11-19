@@ -12,16 +12,24 @@ class OrderService {
     required List<Map<String, dynamic>> cartItems,
     required int totalPrice,
   }) async {
-    final orderRef = _firestore
+    final today = DateTime.now();
+    final dateId =
+        "${today.year}-${today.month.toString().padLeft(2, '0')}-${today.day.toString().padLeft(2, '0')}";
+
+    final dateCollection = _firestore
         .collection('admins')
         .doc(adminUid)
         .collection('orders')
-        .doc(); // 자동 ID 생성
+        .doc(dateId)
+        .collection('list');
+
+    final orderRef = dateCollection.doc(); // 날짜 아래에서 새 order 생성
 
     final orderData = {
       "orderId": orderRef.id,
+      "adminUid": adminUid,
       "tableNumber": tableNumber,
-      "status": "pending", // 주문 접수됨
+      "status": "pending",
       "totalPrice": totalPrice,
       "createdAt": Timestamp.now(),
       "updatedAt": Timestamp.now(),

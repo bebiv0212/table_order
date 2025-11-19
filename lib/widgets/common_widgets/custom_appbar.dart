@@ -1,8 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:lucide_icons_flutter/lucide_icons.dart';
-import 'package:provider/provider.dart';
-import 'package:table_order/providers/auth_provider.dart';
-import 'package:table_order/screens/select_screen.dart';
 
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   const CustomAppBar({
@@ -12,12 +8,14 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
     this.onOrderPressed,
     required this.actionBtn1,
     this.actionBtn2,
+    this.logoutBtn,
   });
 
   final String storeName;
   final String description;
   final Widget actionBtn1;
   final Widget? actionBtn2;
+  final Widget? logoutBtn;
   final VoidCallback? onOrderPressed;
 
   @override
@@ -52,26 +50,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
           ),
         ],
       ),
-      actions: [
-        actionBtn1,
-        SizedBox(width: 10),
-        ?actionBtn2,
-        Padding(
-          padding: EdgeInsets.only(right: 10),
-          child: IconButton(
-            onPressed: () async {
-              await context.read<AuthProvider>().signOut();
-              if (!context.mounted) return;
-              Navigator.pushAndRemoveUntil(
-                context,
-                MaterialPageRoute(builder: (_) => SelectScreen()),
-                (route) => false,
-              );
-            }, //
-            icon: Icon(LucideIcons.logOut),
-          ),
-        ),
-      ],
+      actions: [actionBtn1, SizedBox(width: 10), ?actionBtn2, ?logoutBtn],
     );
   }
 

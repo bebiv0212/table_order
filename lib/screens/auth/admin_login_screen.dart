@@ -1,7 +1,8 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:provider/provider.dart';
-import 'package:table_order/providers/auth_provider.dart';
+import 'package:table_order/providers/auth_provider.dart' as my_auth;
 import 'package:table_order/screens/admin_screen/admin_order_m_screen.dart';
 import 'package:table_order/screens/auth/widget/login_form.dart';
 import 'package:table_order/theme/app_colors.dart';
@@ -20,7 +21,7 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final auth = context.watch<AuthProvider>();
+    final auth = context.watch<my_auth.AuthProvider>();
 
     return LoginForm(
       mode: AppMode.admin,
@@ -45,13 +46,12 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
         final email = _email.text.trim();
         final pw = _password.text.trim();
 
-        // ✅ await 전 안전하게 캡처
+        // await 전 context 보관
         final messenger = ScaffoldMessenger.of(context);
         final navigator = Navigator.of(context);
 
         final err = await auth.signInAdmin(email: email, password: pw);
 
-        // ✅ await 이후 context 검사는 최소화 (State의 mounted만 확인)
         if (!mounted) return;
 
         if (err != null) {
@@ -59,15 +59,10 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
           return;
         }
 
-        // 로그인 성공 → 관리자 메인으로 이동
+        final uid = FirebaseAuth.instance.currentUser!.uid;
+
         navigator.pushAndRemoveUntil(
-          MaterialPageRoute(
-            builder: (_) => AdminOrderMScreen(
-              shopName:
-                  auth.shopName ??
-                  (auth.isLoggedIn ? (auth.shopName ?? '관리자') : '관리자'),
-            ),
-          ),
+          MaterialPageRoute(builder: (_) => AdminOrderMScreen(adminUid: uid)),
           (route) => false,
         );
       },

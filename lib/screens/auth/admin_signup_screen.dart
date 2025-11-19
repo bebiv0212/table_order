@@ -87,7 +87,7 @@ class _AdminSignupScreenState extends State<AdminSignupScreen> {
           navigator.pushAndRemoveUntil(
             MaterialPageRoute(
               builder: (_) =>
-                  AdminOrderMScreen(shopName: auth.shopName ?? shop),
+                  AdminOrderMScreen(adminUid: auth.shopName ?? shop),
             ),
             (route) => false,
           );

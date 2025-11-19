@@ -13,6 +13,7 @@ import 'package:table_order/screens/customer_screen/widget/menu_item_card.dart';
 import 'package:table_order/screens/customer_screen/widget/side_category_selector.dart';
 import 'package:table_order/providers/category_provider.dart';
 import 'package:table_order/providers/cart_provider.dart';
+import 'package:table_order/widgets/common_widgets/logout_button.dart';
 
 class CustomerMenuScreen extends StatelessWidget {
   final String adminUid;
@@ -93,6 +94,7 @@ class CustomerMenuScreen extends StatelessWidget {
             );
           },
         ),
+        logoutBtn: LogoutButton(),
       ),
       body: Stack(
         children: [
@@ -109,7 +111,7 @@ class CustomerMenuScreen extends StatelessWidget {
                     barrierDismissible: true,
                     builder: (_) => StaffCallDialog(
                       onSelect: (type) {
-                        print("직원 호출: $type");
+                        debugPrint("직원 호출: $type");
 
                         // TODO: Firestore에 'staffCall' 컬렉션으로 저장하기
                         Navigator.pop(context);
