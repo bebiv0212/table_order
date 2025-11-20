@@ -275,6 +275,9 @@ class _CustomerMenuBody extends StatelessWidget {
                               totalPrice: cart.totalPrice,
                             );
 
+                            if (!context.mounted) return;
+
+                            // 2) 장바구니 내용 초기화
                             cart.clear();
                             Navigator.pop(context);
 

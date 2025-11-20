@@ -7,18 +7,12 @@ import 'package:table_order/theme/app_colors.dart';
 import 'package:table_order/widgets/common_widgets/grey_text_field.dart';
 import 'package:table_order/screens/customer_screen/customer_menu_screen.dart';
 
-class CustomerLoginScreen extends StatefulWidget {
-  const CustomerLoginScreen({super.key});
+class CustomerLoginScreen extends StatelessWidget {
+  CustomerLoginScreen({super.key});
 
-  @override
-  State<CustomerLoginScreen> createState() => _CustomerLoginScreenState();
-}
-
-class _CustomerLoginScreenState extends State<CustomerLoginScreen> {
   final _email = TextEditingController();
   final _password = TextEditingController();
   final _tableNum = TextEditingController();
-  bool _loading = false;
 
   @override
   Widget build(BuildContext context) {
@@ -43,7 +37,7 @@ class _CustomerLoginScreenState extends State<CustomerLoginScreen> {
         GreyTextField(
           controller: _tableNum,
           label: '테이블 번호',
-          hint: '예: 01, 02, 03...',
+          hint: '01, 02, 03...',
           obscure: false,
         ),
       ],
@@ -52,43 +46,39 @@ class _CustomerLoginScreenState extends State<CustomerLoginScreen> {
         final pw = _password.text.trim();
         final table = _tableNum.text.trim();
 
-        // ✅ context로부터 필요한 객체들을 await 전에 미리 가져오기
         final messenger = ScaffoldMessenger.of(context);
         final navigator = Navigator.of(context);
 
         if (email.isEmpty || pw.isEmpty || table.isEmpty) {
-          messenger.showSnackBar(SnackBar(content: Text('모든 항목을 입력해주세요.')));
+          messenger.showSnackBar(
+            const SnackBar(content: Text('모든 항목을 입력해주세요.')),
+          );
           return;
         }
 
-        setState(() => _loading = true);
         try {
-          // 1️⃣ Firebase 로그인
+          // Firebase 로그인
           final cred = await FirebaseAuth.instance.signInWithEmailAndPassword(
             email: email,
             password: pw,
           );
 
-          if (!context.mounted) return; // await 뒤 context 사용 전 확인
-
           final uid = cred.user!.uid;
           final db = FirebaseFirestore.instance;
 
-          // 2️⃣ 관리자 확인
+          // 관리자 확인
           final adminDoc = await db.collection('admins').doc(uid).get();
-
-          if (!context.mounted) return;
-
           if (!adminDoc.exists) {
-            messenger.showSnackBar(SnackBar(content: Text('관리자 계정이 아닙니다.')));
+            messenger.showSnackBar(
+              const SnackBar(content: Text('관리자 계정이 아닙니다.')),
+            );
             await FirebaseAuth.instance.signOut();
-            setState(() => _loading = false);
             return;
           }
 
-          final shopName = adminDoc.data()?['shopName'] ?? '매장';
+          final shopName = adminDoc['shopName'] ?? '매장';
 
-          // 3️⃣ 테이블 문서 업서트
+          // 테이블 문서 업서트
           final tableRef = db
               .collection('admins')
               .doc(uid)
@@ -102,9 +92,7 @@ class _CustomerLoginScreenState extends State<CustomerLoginScreen> {
             'createdAt': FieldValue.serverTimestamp(),
           }, SetOptions(merge: true));
 
-          if (!context.mounted) return;
-
-          // 4️⃣ 화면 이동 — 미리 가져온 navigator 사용
+          // 이동
           navigator.pushReplacement(
             MaterialPageRoute(
               builder: (_) => CustomerMenuScreen(
@@ -115,23 +103,12 @@ class _CustomerLoginScreenState extends State<CustomerLoginScreen> {
             ),
           );
         } on FirebaseAuthException catch (e) {
-          if (!context.mounted) return;
           messenger.showSnackBar(
             SnackBar(content: Text(e.message ?? '로그인 실패')),
           );
-        } finally {
-          if (mounted) setState(() => _loading = false);
         }
       },
-      submitText: _loading ? '로그인 중...' : '주문 시작하기',
+      submitText: '주문 시작하기',
     );
-  }
-
-  @override
-  void dispose() {
-    _email.dispose();
-    _password.dispose();
-    _tableNum.dispose();
-    super.dispose();
   }
 }
