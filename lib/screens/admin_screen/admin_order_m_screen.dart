@@ -8,6 +8,7 @@ import 'package:table_order/screens/admin_screen/admin_menu_manage_screen.dart';
 import 'package:table_order/screens/admin_screen/widget/order_card.dart';
 import 'package:table_order/screens/admin_screen/widget/order_list.dart';
 import 'package:table_order/screens/admin_screen/widget/state_card.dart';
+import 'package:table_order/services/admin_service.dart';
 import 'package:table_order/utlis/format_utils.dart';
 import 'package:table_order/widgets/common_widgets/appbar_action_btn.dart';
 import 'package:table_order/widgets/common_widgets/custom_appbar.dart';
@@ -20,6 +21,8 @@ class AdminOrderMScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final service = AdminService();
+
     // OrderProvider를 이 화면의 상태 관리용
     return ChangeNotifierProvider(
       create: (_) {
@@ -72,7 +75,7 @@ class AdminOrderMScreen extends StatelessWidget {
                         .collection('admins')
                         .doc(adminUid)
                         .collection('orders')
-                        .doc(_todayId())
+                        .doc(provider.todayId)
                         .collection('list')
                         .snapshots(),
                     builder: (context, snapshot) {
@@ -201,7 +204,7 @@ class AdminOrderMScreen extends StatelessWidget {
                           .collection('admins')
                           .doc(adminUid)
                           .collection('orders')
-                          .doc(_todayId())
+                          .doc(provider.todayId)
                           .collection('list')
                           .orderBy("createdAt", descending: true)
                           .snapshots(),
@@ -278,16 +281,26 @@ class AdminOrderMScreen extends StatelessWidget {
                                   .map((e) => "${e['name']} × ${e['quantity']}")
                                   .join(", ");
 
+
+
+
                               /// 주문 요약
                               return OrderList(
                                 id: orderId,
                                 time: timeStr,
                                 price: "${formatWon(totalPrice)}원",
                                 menu: menu,
-                                onProcess: () =>
-                                    _updateStatus(adminUid, orderId, "done"),
-                                onPaid: () =>
-                                    _updateStatus(adminUid, orderId, "paid"),
+                                onProcess: () => service.updateStatus(
+                                  adminUid: adminUid,
+                                  orderId: orderId,
+                                  newStatus: "done",
+                                ),
+
+                                onPaid: () => service.updateStatus(
+                                  adminUid: adminUid,
+                                  orderId: orderId,
+                                  newStatus: "paid",
+                                ),
                                 currentStatus: selectedStatus,
                               );
                             }).toList();
@@ -302,9 +315,13 @@ class AdminOrderMScreen extends StatelessWidget {
                               status: selectedStatus,
                               onDelete: () {
                                 for (final doc in tableDocs) {
-                                  final orderId =
-                                      (doc.data() as Map)["orderId"];
-                                  _deleteOrder(adminUid, orderId);
+                                  final data = doc.data() as Map<String, dynamic>;
+                                  final orderId = data["orderId"];
+
+                                  service.deleteOrder(
+                                    adminUid: adminUid,
+                                    orderId: orderId,
+                                  );
                                 }
                               },
                               orderLists: orderLists,
@@ -321,35 +338,5 @@ class AdminOrderMScreen extends StatelessWidget {
         },
       ),
     );
-  }
-
-  /// 오늘 날짜 ID
-  String _todayId() {
-    final now = DateTime.now();
-    return "${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}"; //intl사용해서 수정하면 좋을듯
-  }
-
-  /// 상태 업데이트
-  Future<void> _updateStatus(String adminUid, String id, String status) async {
-    await FirebaseFirestore.instance
-        .collection('admins')
-        .doc(adminUid)
-        .collection('orders')
-        .doc(_todayId())
-        .collection('list')
-        .doc(id)
-        .update({"status": status, "updatedAt": Timestamp.now()});
-  }
-
-  /// 삭제
-  Future<void> _deleteOrder(String adminUid, String id) async {
-    await FirebaseFirestore.instance
-        .collection('admins')
-        .doc(adminUid)
-        .collection('orders')
-        .doc(_todayId())
-        .collection('list')
-        .doc(id)
-        .delete();
   }
 }
