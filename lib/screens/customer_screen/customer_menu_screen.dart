@@ -13,6 +13,7 @@ import 'package:table_order/screens/customer_screen/widget/menu_item_card.dart';
 import 'package:table_order/screens/customer_screen/widget/side_category_selector.dart';
 import 'package:table_order/providers/category_provider.dart';
 import 'package:table_order/providers/cart_provider.dart';
+import 'package:table_order/providers/menu_provider.dart';   // 🔥 추가됨
 import 'package:table_order/widgets/common_widgets/logout_button.dart';
 
 class CustomerMenuScreen extends StatelessWidget {
@@ -29,53 +30,60 @@ class CustomerMenuScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    return ChangeNotifierProvider(
+      /// 🔥 화면 들어오면 Firebase에서 메뉴 로딩
+      create: (_) {
+        final provider = MenuProvider();
+        provider.loadMenus(adminUid);
+        return provider;
+      },
+
+      /// 🔥 Provider 생성 후 본문 위젯 빌드
+      child: _CustomerMenuBody(
+        adminUid: adminUid,
+        shopName: shopName,
+        tableNumber: tableNumber,
+      ),
+    );
+  }
+}
+
+/// ----------------------------------------------------------------------
+/// 🔥 실제 화면 UI는 별도 위젯으로 분리 (Provider rebuild 충돌 방지)
+/// ----------------------------------------------------------------------
+class _CustomerMenuBody extends StatelessWidget {
+  final String adminUid;
+  final String shopName;
+  final String tableNumber;
+
+  const _CustomerMenuBody({
+    required this.adminUid,
+    required this.shopName,
+    required this.tableNumber,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final menuProv = context.watch<MenuProvider>();   // 🔥 Firebase 메뉴 목록
     final category = context.watch<CategoryProvider>().selected;
     final cart = context.watch<CartProvider>();
     final orderService = OrderService();
 
-    final List<Map<String, dynamic>> menuItems = [
-      {
-        'title': '아메리카노',
-        'subtitle': '진한 에스프레소에 뜨거운 물을 더한 기본 커피',
-        'price': 4500,
-        'tag': '음료',
-        'imageUrl':
-            'https://images.unsplash.com/photo-1509043759401-136742328bb3?q=80&w=1600',
-      },
-      {
-        'title': '카페라떼',
-        'subtitle': '부드러운 우유와 에스프레소의 조화',
-        'price': 5000,
-        'tag': '음료',
-        'imageUrl':
-            'https://images.unsplash.com/photo-1511920170033-f8396924c348?q=80&w=1600',
-      },
-      {
-        'title': '리코타 샐러드',
-        'subtitle': '리코타 치즈와 신선한 채소의 조화',
-        'price': 8500,
-        'tag': '메인',
-        'imageUrl':
-            'https://images.unsplash.com/photo-1550304943-4f24f54ddde9?q=80&w=1600',
-      },
-      {
-        'title': '티라미수 케이크',
-        'subtitle': '부드럽고 달콤한 치즈케이크',
-        'price': 6000,
-        'tag': '디저트',
-        'imageUrl':
-            'https://images.unsplash.com/photo-1550304943-4f24f54ddde9?q=80&w=1600',
-      },
+    // 🔥 카테고리 자동 생성 (중복 제거 + '전체' 추가)
+    final categories = [
+      '전체',
+      ...{for (final m in menuProv.menus) m.category}
     ];
 
-    final List<String> categories = ['전체', '메인', '음료', '디저트'];
-
-    final filteredItems = category == '전체'
-        ? menuItems
-        : menuItems.where((m) => m['tag'] == category).toList();
+    // 🔥 선택된 카테고리로 필터링
+    final filteredMenus = category == '전체'
+        ? menuProv.menus
+        : menuProv.menus.where((m) => m.category == category).toList();
 
     return Scaffold(
       backgroundColor: Color(0xFFF9F9F9),
+
+      /// 상단 AppBar
       appBar: CustomAppBar(
         storeName: shopName,
         description: '테이블 $tableNumber',
@@ -94,37 +102,41 @@ class CustomerMenuScreen extends StatelessWidget {
             );
           },
         ),
-        logoutBtn: LogoutButton(),
+        logoutBtn:LogoutButton(),
       ),
+
       body: Stack(
         children: [
           Row(
             children: [
+              /// 🔥 카테고리 선택 패널
               SideCategorySelector(
                 categories: categories,
-                selectedCategory: category,
-                onCategorySelected: (cat) =>
-                    context.read<CategoryProvider>().select(cat),
+              // selectedCategory: category,
+               // onCategorySelected: (cat) =>
+                 //   context.read<CategoryProvider>().select(cat),
                 onCallStaff: () {
                   showDialog(
                     context: context,
-                    barrierDismissible: true,
                     builder: (_) => StaffCallDialog(
                       onSelect: (type) {
                         debugPrint("직원 호출: $type");
-
-                        // TODO: Firestore에 'staffCall' 컬렉션으로 저장하기
                         Navigator.pop(context);
                       },
                     ),
                   );
                 },
               ),
+
+              /// 메뉴 그리드 영역
               Expanded(
-                child: GridView.builder(
+                child: menuProv.loading
+                    ? Center(child: CircularProgressIndicator())
+                    : GridView.builder(
                   padding: EdgeInsets.all(16),
-                  itemCount: filteredItems.length,
-                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  itemCount: filteredMenus.length,
+                  gridDelegate:
+                  SliverGridDelegateWithFixedCrossAxisCount(
                     crossAxisCount: 4,
                     mainAxisSpacing: 16,
                     crossAxisSpacing: 16,
@@ -132,51 +144,94 @@ class CustomerMenuScreen extends StatelessWidget {
                     mainAxisExtent: 300,
                   ),
                   itemBuilder: (context, index) {
-                    final item = filteredItems[index];
-                    final current =
-                        cart.items.firstWhere(
-                              (e) => e['title'] == item['title'],
-                              orElse: () => {'count': 0},
-                            )['count']
-                            as int;
+                    final menu = filteredMenus[index];
+
+                    // 🔥 현재 장바구니에 몇 개 담겨있나?
+                    final current = cart.items.firstWhere(
+                          (e) => e['title'] == menu.name,
+                      orElse: () => {'count': 0},
+                    )['count'] as int;
 
                     return MenuItemCard(
-                      title: item['title'],
-                      subtitle: item['subtitle'],
-                      price: item['price'],
-                      imageUrl: item['imageUrl'],
-                      tagText: item['tag'],
+                      title: menu.name,
+                      subtitle: menu.description,
+                      price: menu.price,
+                      imageUrl: menu.imageUrl,
+                      tagText: menu.category,
                       count: current,
-                      onIncrease: () => cart.addItem(item),
-                      onDecrease: () => cart.decreaseItem(item),
-                      onTap: () {
+
+                      /// 🔥 품절 처리 적용
+                      isSoldOut: !menu.isAvailable,
+
+                      /// 🔥 수량 증가
+                      onIncrease: () {
+                        if (!menu.isAvailable) return;
+                        cart.addItem({
+                          'title': menu.name,
+                          'price': menu.price,
+                          'imageUrl': menu.imageUrl,
+                          'tag': menu.category,
+                        });
+                      },
+
+                      /// 🔥 수량 감소
+                      onDecrease: () {
+                        if (!menu.isAvailable) return;
+                        cart.decreaseItem({
+                          'title': menu.name,
+                        });
+                      },
+
+                      /// 🔥 상품 상세 보기
+                      onTap: menu.isAvailable
+                          ? () {
                         showDialog(
                           context: context,
                           builder: (_) => MenuDetailCard(
-                            title: item['title'],
-                            subtitle: item['subtitle'],
-                            price: item['price'],
-                            imageUrl: item['imageUrl'],
-                            tagText: item['tag'],
+                            title: menu.name,
+                            subtitle: menu.description,
+                            price: menu.price,
+                            imageUrl: menu.imageUrl,
+                            tagText: menu.category,
                             initialCount: current == 0 ? 1 : current,
-                            onAddToCart: (title, price, count) {
-                              cart.setItemCount(title, count);
+
+                            onAddToCart: (title, price, newCount) {
+                              final existIndex = cart.items.indexWhere(
+                                    (e) => e['title'] == title,
+                              );
+
+                              if (existIndex == -1) {
+                                cart.addItem({
+                                  'title': menu.name,
+                                  'price': menu.price,
+                                  'imageUrl': menu.imageUrl,
+                                  'tag': menu.category,
+                                });
+                              }
+
+                              cart.setItemCount(title, newCount);
                             },
                           ),
                         );
-                      },
+                      }
+                          : null,
+
                     );
                   },
                 ),
               ),
             ],
           ),
+
+          /// 하단 장바구니 패널
           AnimatedPositioned(
             duration: Duration(milliseconds: 300),
             curve: Curves.easeOut,
+
             left: 0,
             right: 0,
             bottom: cart.items.isEmpty ? -100 : 0,
+
             child: Container(
               height: 70,
               padding: EdgeInsets.symmetric(horizontal: 20),
@@ -190,24 +245,29 @@ class CustomerMenuScreen extends StatelessWidget {
                   ),
                 ],
               ),
+
+              /// 장바구니 수량 + 버튼
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
                     '총 ${cart.totalCount}개\n${formatWon(cart.totalPrice)}원',
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                    style: TextStyle(
+                        fontSize: 16, fontWeight: FontWeight.w600),
                   ),
+
                   ElevatedButton.icon(
                     onPressed: () {
                       showGeneralDialog(
                         context: context,
                         barrierDismissible: true,
                         barrierLabel: '',
-                        transitionDuration: const Duration(milliseconds: 300),
+                        transitionDuration:
+                        Duration(milliseconds: 300),
                         pageBuilder: (_, __, ___) => CartSideSheet(
                           onOrder: () async {
                             if (cart.items.isEmpty) return;
-                            // 1) Firestore에 주문 저장
+
                             await orderService.submitOrder(
                               adminUid: adminUid,
                               tableNumber: tableNumber,
@@ -219,27 +279,25 @@ class CustomerMenuScreen extends StatelessWidget {
 
                             // 2) 장바구니 내용 초기화
                             cart.clear();
-
-                            // 3) 장바구니 창 닫기
                             Navigator.pop(context);
 
-                            // 4) 사용자 안내
                             ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text("주문이 접수되었습니다!")),
+                              SnackBar(
+                                  content: Text("주문이 접수되었습니다!")),
                             );
                           },
                         ),
-                        transitionBuilder: (_, anim, __, child) {
-                          final offset =
-                              Tween(
-                                begin: const Offset(1, 0),
-                                end: Offset.zero,
-                              ).animate(
-                                CurvedAnimation(
-                                  parent: anim,
-                                  curve: Curves.easeOutCubic,
-                                ),
-                              );
+                        transitionBuilder:
+                            (_, anim, __, child) {
+                          final offset = Tween(
+                            begin: Offset(1, 0),
+                            end: Offset.zero,
+                          ).animate(
+                            CurvedAnimation(
+                              parent: anim,
+                              curve: Curves.easeOutCubic,
+                            ),
+                          );
                           return SlideTransition(
                             position: offset,
                             child: child,
@@ -247,7 +305,8 @@ class CustomerMenuScreen extends StatelessWidget {
                         },
                       );
                     },
-                    icon: Icon(LucideIcons.shoppingCart, color: Colors.white),
+                    icon: Icon(LucideIcons.shoppingCart,
+                        color: Colors.white),
                     label: Text('장바구니 보기'),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Color(0xFFE8751A),
