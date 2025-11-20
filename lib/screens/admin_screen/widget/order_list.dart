@@ -39,7 +39,10 @@ class OrderList extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(time, style: TextStyle(fontSize: 13, color: Colors.black54)),
-              Text(price, style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
+              Text(
+                price,
+                style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
+              ),
             ],
           ),
 
@@ -53,7 +56,7 @@ class OrderList extends StatelessWidget {
           Row(
             children: [
               // 테이블별에서만 표시
-              if (currentStatus == OrderStatus.table)
+              if (currentStatus == OrderStatus.pending)
                 // 주문처리 완료 버튼
                 Expanded(
                   child: ElevatedButton(
@@ -62,7 +65,9 @@ class OrderList extends StatelessWidget {
                       backgroundColor: AppColors.adminPrimary,
                       foregroundColor: Colors.white,
                       padding: EdgeInsets.symmetric(vertical: 6),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(6),
+                      ),
                     ),
                     child: Text("주문처리 완료", style: TextStyle(fontSize: 12)),
                   ),
@@ -71,9 +76,8 @@ class OrderList extends StatelessWidget {
               SizedBox(width: 8),
 
               // 테이블별, 완료 에서만 결제완료 표시
-              if (currentStatus == OrderStatus.table ||
+              if (currentStatus == OrderStatus.pending ||
                   currentStatus == OrderStatus.done)
-
                 // 결제완료 버튼
                 Expanded(
                   child: OutlinedButton(
@@ -81,9 +85,17 @@ class OrderList extends StatelessWidget {
                     style: OutlinedButton.styleFrom(
                       side: BorderSide(color: AppColors.adminPrimary),
                       padding: EdgeInsets.symmetric(vertical: 6),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(6),
+                      ),
                     ),
-                    child: Text("결제완료", style: TextStyle(fontSize: 12, color: AppColors.adminPrimary)),
+                    child: Text(
+                      "결제완료",
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: AppColors.adminPrimary,
+                      ),
+                    ),
                   ),
                 ),
             ],

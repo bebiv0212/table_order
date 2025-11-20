@@ -13,7 +13,7 @@ import 'package:table_order/screens/customer_screen/widget/menu_item_card.dart';
 import 'package:table_order/screens/customer_screen/widget/side_category_selector.dart';
 import 'package:table_order/providers/category_provider.dart';
 import 'package:table_order/providers/cart_provider.dart';
-import 'package:table_order/providers/menu_provider.dart';   // 🔥 추가됨
+import 'package:table_order/providers/menu_provider.dart'; // 🔥 추가됨
 import 'package:table_order/widgets/common_widgets/logout_button.dart';
 
 class CustomerMenuScreen extends StatelessWidget {
@@ -64,7 +64,7 @@ class _CustomerMenuBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final menuProv = context.watch<MenuProvider>();   // 🔥 Firebase 메뉴 목록
+    final menuProv = context.watch<MenuProvider>(); // 🔥 Firebase 메뉴 목록
     final category = context.watch<CategoryProvider>().selected;
     final cart = context.watch<CartProvider>();
     final orderService = OrderService();
@@ -72,7 +72,7 @@ class _CustomerMenuBody extends StatelessWidget {
     // 🔥 카테고리 자동 생성 (중복 제거 + '전체' 추가)
     final categories = [
       '전체',
-      ...{for (final m in menuProv.menus) m.category}
+      ...{for (final m in menuProv.menus) m.category},
     ];
 
     // 🔥 선택된 카테고리로 필터링
@@ -102,7 +102,7 @@ class _CustomerMenuBody extends StatelessWidget {
             );
           },
         ),
-        logoutBtn:LogoutButton(),
+        logoutBtn: LogoutButton(),
       ),
 
       body: Stack(
@@ -112,9 +112,9 @@ class _CustomerMenuBody extends StatelessWidget {
               /// 🔥 카테고리 선택 패널
               SideCategorySelector(
                 categories: categories,
-              // selectedCategory: category,
-               // onCategorySelected: (cat) =>
-                 //   context.read<CategoryProvider>().select(cat),
+                // selectedCategory: category,
+                // onCategorySelected: (cat) =>
+                //   context.read<CategoryProvider>().select(cat),
                 onCallStaff: () {
                   showDialog(
                     context: context,
@@ -133,92 +133,93 @@ class _CustomerMenuBody extends StatelessWidget {
                 child: menuProv.loading
                     ? Center(child: CircularProgressIndicator())
                     : GridView.builder(
-                  padding: EdgeInsets.all(16),
-                  itemCount: filteredMenus.length,
-                  gridDelegate:
-                  SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 4,
-                    mainAxisSpacing: 16,
-                    crossAxisSpacing: 16,
-                    childAspectRatio: 0.75,
-                    mainAxisExtent: 300,
-                  ),
-                  itemBuilder: (context, index) {
-                    final menu = filteredMenus[index];
+                        padding: EdgeInsets.all(16),
+                        itemCount: filteredMenus.length,
+                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 4,
+                          mainAxisSpacing: 16,
+                          crossAxisSpacing: 16,
+                          childAspectRatio: 0.75,
+                          mainAxisExtent: 300,
+                        ),
+                        itemBuilder: (context, index) {
+                          final menu = filteredMenus[index];
 
-                    // 🔥 현재 장바구니에 몇 개 담겨있나?
-                    final current = cart.items.firstWhere(
-                          (e) => e['title'] == menu.name,
-                      orElse: () => {'count': 0},
-                    )['count'] as int;
+                          // 🔥 현재 장바구니에 몇 개 담겨있나?
+                          final current =
+                              cart.items.firstWhere(
+                                    (e) => e['title'] == menu.name,
+                                    orElse: () => {'count': 0},
+                                  )['count']
+                                  as int;
 
-                    return MenuItemCard(
-                      title: menu.name,
-                      subtitle: menu.description,
-                      price: menu.price,
-                      imageUrl: menu.imageUrl,
-                      tagText: menu.category,
-                      count: current,
-
-                      /// 🔥 품절 처리 적용
-                      isSoldOut: !menu.isAvailable,
-
-                      /// 🔥 수량 증가
-                      onIncrease: () {
-                        if (!menu.isAvailable) return;
-                        cart.addItem({
-                          'title': menu.name,
-                          'price': menu.price,
-                          'imageUrl': menu.imageUrl,
-                          'tag': menu.category,
-                        });
-                      },
-
-                      /// 🔥 수량 감소
-                      onDecrease: () {
-                        if (!menu.isAvailable) return;
-                        cart.decreaseItem({
-                          'title': menu.name,
-                        });
-                      },
-
-                      /// 🔥 상품 상세 보기
-                      onTap: menu.isAvailable
-                          ? () {
-                        showDialog(
-                          context: context,
-                          builder: (_) => MenuDetailCard(
+                          return MenuItemCard(
                             title: menu.name,
                             subtitle: menu.description,
                             price: menu.price,
                             imageUrl: menu.imageUrl,
                             tagText: menu.category,
-                            initialCount: current == 0 ? 1 : current,
+                            count: current,
 
-                            onAddToCart: (title, price, newCount) {
-                              final existIndex = cart.items.indexWhere(
-                                    (e) => e['title'] == title,
-                              );
+                            /// 🔥 품절 처리 적용
+                            isSoldOut: !menu.isAvailable,
 
-                              if (existIndex == -1) {
-                                cart.addItem({
-                                  'title': menu.name,
-                                  'price': menu.price,
-                                  'imageUrl': menu.imageUrl,
-                                  'tag': menu.category,
-                                });
-                              }
-
-                              cart.setItemCount(title, newCount);
+                            /// 🔥 수량 증가
+                            onIncrease: () {
+                              if (!menu.isAvailable) return;
+                              cart.addItem({
+                                'title': menu.name,
+                                'price': menu.price,
+                                'imageUrl': menu.imageUrl,
+                                'tag': menu.category,
+                              });
                             },
-                          ),
-                        );
-                      }
-                          : null,
 
-                    );
-                  },
-                ),
+                            /// 🔥 수량 감소
+                            onDecrease: () {
+                              if (!menu.isAvailable) return;
+                              cart.decreaseItem({'title': menu.name});
+                            },
+
+                            /// 🔥 상품 상세 보기
+                            onTap: menu.isAvailable
+                                ? () {
+                                    showDialog(
+                                      context: context,
+                                      builder: (_) => MenuDetailCard(
+                                        title: menu.name,
+                                        subtitle: menu.description,
+                                        price: menu.price,
+                                        imageUrl: menu.imageUrl,
+                                        tagText: menu.category,
+                                        initialCount: current == 0
+                                            ? 1
+                                            : current,
+
+                                        onAddToCart: (title, price, newCount) {
+                                          final existIndex = cart.items
+                                              .indexWhere(
+                                                (e) => e['title'] == title,
+                                              );
+
+                                          if (existIndex == -1) {
+                                            cart.addItem({
+                                              'title': menu.name,
+                                              'price': menu.price,
+                                              'imageUrl': menu.imageUrl,
+                                              'tag': menu.category,
+                                            });
+                                          }
+
+                                          cart.setItemCount(title, newCount);
+                                        },
+                                      ),
+                                    );
+                                  }
+                                : null,
+                          );
+                        },
+                      ),
               ),
             ],
           ),
@@ -252,8 +253,7 @@ class _CustomerMenuBody extends StatelessWidget {
                 children: [
                   Text(
                     '총 ${cart.totalCount}개\n${formatWon(cart.totalPrice)}원',
-                    style: TextStyle(
-                        fontSize: 16, fontWeight: FontWeight.w600),
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
                   ),
 
                   ElevatedButton.icon(
@@ -262,8 +262,7 @@ class _CustomerMenuBody extends StatelessWidget {
                         context: context,
                         barrierDismissible: true,
                         barrierLabel: '',
-                        transitionDuration:
-                        Duration(milliseconds: 300),
+                        transitionDuration: Duration(milliseconds: 300),
                         pageBuilder: (_, __, ___) => CartSideSheet(
                           onOrder: () async {
                             if (cart.items.isEmpty) return;
@@ -282,22 +281,21 @@ class _CustomerMenuBody extends StatelessWidget {
                             Navigator.pop(context);
 
                             ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                  content: Text("주문이 접수되었습니다!")),
+                              SnackBar(content: Text("주문이 접수되었습니다!")),
                             );
                           },
                         ),
-                        transitionBuilder:
-                            (_, anim, __, child) {
-                          final offset = Tween(
-                            begin: Offset(1, 0),
-                            end: Offset.zero,
-                          ).animate(
-                            CurvedAnimation(
-                              parent: anim,
-                              curve: Curves.easeOutCubic,
-                            ),
-                          );
+                        transitionBuilder: (_, anim, __, child) {
+                          final offset =
+                              Tween(
+                                begin: Offset(1, 0),
+                                end: Offset.zero,
+                              ).animate(
+                                CurvedAnimation(
+                                  parent: anim,
+                                  curve: Curves.easeOutCubic,
+                                ),
+                              );
                           return SlideTransition(
                             position: offset,
                             child: child,
@@ -305,8 +303,7 @@ class _CustomerMenuBody extends StatelessWidget {
                         },
                       );
                     },
-                    icon: Icon(LucideIcons.shoppingCart,
-                        color: Colors.white),
+                    icon: Icon(LucideIcons.shoppingCart, color: Colors.white),
                     label: Text('장바구니 보기'),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Color(0xFFE8751A),

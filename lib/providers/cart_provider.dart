@@ -53,7 +53,6 @@ class CartProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-
   //특정 메뉴의 수량을 강제로 설정하는 메서드.
   void setItemCount(String title, int count) {
     final index = _cart.indexWhere((e) => e['title'] == title);

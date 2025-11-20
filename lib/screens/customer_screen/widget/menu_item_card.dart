@@ -21,8 +21,10 @@ class MenuItemCard extends StatelessWidget {
     /// 수량 증가 콜백 (예: 장바구니에 1개 추가)
     /// - nullable로 둔 이유: 어떤 상황에서는 + 버튼을 비활성화해야 할 수도 있어서.
     this.onIncrease,
+
     /// 수량 감소 콜백 (예: 장바구니에서 1개 제거)
     this.onDecrease,
+
     /// 카드 전체 탭 콜백 (예: 상세 보기 다이얼로그 열기)
     this.onTap,
 
@@ -51,7 +53,7 @@ class MenuItemCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final radius = 12.0;// 카드 모서리 둥글기 (여러 곳에서 쓰이기 때문에 변수로)
+    final radius = 12.0; // 카드 모서리 둥글기 (여러 곳에서 쓰이기 때문에 변수로)
 
     return InkWell(
       // InkWell: 카드 전체에 터치 ripple 효과 주기 위해 사용.
@@ -72,7 +74,7 @@ class MenuItemCard extends StatelessWidget {
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(radius),
               ),
-              clipBehavior: Clip.antiAlias,// 이미지 모서리도 카드 라운드에 맞게 잘리도록
+              clipBehavior: Clip.antiAlias, // 이미지 모서리도 카드 라운드에 맞게 잘리도록
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -82,7 +84,7 @@ class MenuItemCard extends StatelessWidget {
                     width: double.infinity,
                     child: Image.network(
                       imageUrl,
-                      fit: BoxFit.cover,// 카드 가로폭에 꽉 차게
+                      fit: BoxFit.cover, // 카드 가로폭에 꽉 차게
                       // 이미지 로딩 실패 대비용
                       errorBuilder: (_, __, ___) => Container(
                         color: Colors.grey[200],
@@ -109,7 +111,7 @@ class MenuItemCard extends StatelessWidget {
                               fontWeight: FontWeight.bold,
                               color: Colors.black87,
                             ),
-                            overflow: TextOverflow.ellipsis,// 너무 길면 ... 처리
+                            overflow: TextOverflow.ellipsis, // 너무 길면 ... 처리
                           ),
                         ),
 
@@ -142,7 +144,7 @@ class MenuItemCard extends StatelessWidget {
                     padding: EdgeInsets.symmetric(horizontal: 12),
                     child: Text(
                       subtitle,
-                      maxLines: 2,
+                      maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
                         fontSize: 13,
@@ -151,9 +153,7 @@ class MenuItemCard extends StatelessWidget {
                     ),
                   ),
 
-                  Spacer(),// 위 내용과 아래 버튼 영역 사이의 여백 확보
-
-
+                  Spacer(), // 위 내용과 아래 버튼 영역 사이의 여백 확보
                   /// 가격 + 버튼
                   Padding(
                     padding: EdgeInsets.fromLTRB(12, 4, 12, 10),
@@ -172,66 +172,61 @@ class MenuItemCard extends StatelessWidget {
                         ),
 
                         // 오른쪽: 수량/담기 UI (품절일 경우 전체 숨김)
-                        if (!isSoldOut)
-                          ...[
-                            // 아직 장바구니에 없는 상태(count == 0) → "담기" 버튼
-                            if (count == 0)
-                              ElevatedButton.icon(
-                                // onIncrease는 nullable이지만,
-                                // Flutter에서 onPressed: null 이면 버튼이 비활성화되므로
-                                // 굳이 삼항 연산자로 나눌 필요 없이 그대로 전달.
-                                onPressed: onIncrease,
-                                icon: Icon(LucideIcons.plus, size: 14),
-                                label: Text("담기"),
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor:
-                                  AppColors.customerPrimary,
-                                  foregroundColor: Colors.white,
-                                  padding: EdgeInsets.symmetric(
-                                    horizontal: 10,
-                                  ),
-                                  elevation: 0,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                ),
-                              )
-                            // count > 0 → 수량 조절 UI (- count +)
-                            else
-                              Container(
-                                height: 36,
-                                padding:
-                                EdgeInsets.symmetric(horizontal: 4),
-                                decoration: BoxDecoration(
-                                  border: Border.all(color: Colors.black26),
+                        if (!isSoldOut) ...[
+                          // 아직 장바구니에 없는 상태(count == 0) → "담기" 버튼
+                          if (count == 0)
+                            ElevatedButton.icon(
+                              // onIncrease는 nullable이지만,
+                              // Flutter에서 onPressed: null 이면 버튼이 비활성화되므로
+                              // 굳이 삼항 연산자로 나눌 필요 없이 그대로 전달.
+                              onPressed: onIncrease,
+                              icon: Icon(LucideIcons.plus, size: 14),
+                              label: Text("담기"),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: AppColors.customerPrimary,
+                                foregroundColor: Colors.white,
+                                padding: EdgeInsets.symmetric(horizontal: 10),
+                                elevation: 0,
+                                shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(8),
                                 ),
-                                child: Row(
-                                  children: [
-                                    IconButton(
-                                      icon: Icon(LucideIcons.minus),
-                                      onPressed: onDecrease, // null이면 자동 비활성화
-                                      iconSize: 18,
-                                    ),
-                                    Text(
-                                      '$count',
-                                      style: TextStyle(
-                                        fontSize: 15,
-                                        fontWeight: FontWeight.w500,
-                                      ),
-                                    ),
-                                    IconButton(
-                                      icon: Icon(
-                                        LucideIcons.plus,
-                                        color: AppColors.customerPrimary,
-                                      ),
-                                      onPressed: onIncrease, // null이면 자동 비활성화
-                                      iconSize: 18,
-                                    ),
-                                  ],
-                                ),
                               ),
-                          ],
+                            )
+                          // count > 0 → 수량 조절 UI (- count +)
+                          else
+                            Container(
+                              height: 36,
+                              padding: EdgeInsets.symmetric(horizontal: 4),
+                              decoration: BoxDecoration(
+                                border: Border.all(color: Colors.black26),
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: Row(
+                                children: [
+                                  IconButton(
+                                    icon: Icon(LucideIcons.minus),
+                                    onPressed: onDecrease, // null이면 자동 비활성화
+                                    iconSize: 18,
+                                  ),
+                                  Text(
+                                    '$count',
+                                    style: TextStyle(
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                  IconButton(
+                                    icon: Icon(
+                                      LucideIcons.plus,
+                                      color: AppColors.customerPrimary,
+                                    ),
+                                    onPressed: onIncrease, // null이면 자동 비활성화
+                                    iconSize: 18,
+                                  ),
+                                ],
+                              ),
+                            ),
+                        ],
                       ],
                     ),
                   ),
@@ -245,10 +240,9 @@ class MenuItemCard extends StatelessWidget {
                 right: 12,
                 top: 12,
                 child: Container(
-                  padding:
-                  EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                  padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                   decoration: BoxDecoration(
-                    color: Colors.black.withOpacity(0.7),
+                    color: Colors.black.withValues(alpha: 0.7),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Text(
