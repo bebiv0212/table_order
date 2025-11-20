@@ -8,6 +8,7 @@ import 'package:table_order/screens/admin_screen/admin_menu_manage_screen.dart';
 import 'package:table_order/screens/admin_screen/widget/order_card.dart';
 import 'package:table_order/screens/admin_screen/widget/order_list.dart';
 import 'package:table_order/screens/admin_screen/widget/state_card.dart';
+import 'package:table_order/services/admin_service.dart';
 import 'package:table_order/utlis/format_utils.dart';
 import 'package:table_order/widgets/common_widgets/appbar_action_btn.dart';
 import 'package:table_order/widgets/common_widgets/custom_appbar.dart';
@@ -20,6 +21,8 @@ class AdminOrderMScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final service = AdminService();
+
     // OrderProvider를 이 화면의 상태 관리용
     return ChangeNotifierProvider(
       create: (_) {
@@ -56,7 +59,9 @@ class AdminOrderMScreen extends StatelessWidget {
               actionBtn2: AppbarActionBtn(
                 icon: LucideIcons.messageSquare,
                 title: '리뷰관리',
-                onPressed: () { debugPrint("리뷰관리 클릭"); },
+                onPressed: () {
+                  debugPrint("리뷰관리 클릭");
+                },
               ),
               logoutBtn: LogoutButton(),
             ),
@@ -70,14 +75,18 @@ class AdminOrderMScreen extends StatelessWidget {
                         .collection('admins')
                         .doc(adminUid)
                         .collection('orders')
-                        .doc(_todayId())
+                        .doc(provider.todayId)
                         .collection('list')
                         .snapshots(),
                     builder: (context, snapshot) {
                       final docs = snapshot.hasData ? snapshot.data!.docs : [];
 
                       /// 전체주문 건수
-                      final totalOrders = docs.length;
+                      final pendingOrders = docs
+                          .where(
+                            (d) => (d.data() as Map)['status'] == 'pending',
+                          )
+                          .length;
 
                       /// 완료 건수
                       final doneOrders = docs
@@ -92,10 +101,10 @@ class AdminOrderMScreen extends StatelessWidget {
                       /// 총매출 계산
                       final int totalRevenue = docs
                           .where((d) => (d.data() as Map)['status'] == 'paid')
-                          .fold(0, (sum, d) {
-                        final price = (d.data() as Map)['totalPrice'];
-                        return sum + (price as num).toInt();
-                      });
+                          .fold(0, (total, d) {
+                            final price = (d.data() as Map)['totalPrice'];
+                            return total + (price as num).toInt();
+                          });
 
                       return Row(
                         spacing: 10,
@@ -103,13 +112,13 @@ class AdminOrderMScreen extends StatelessWidget {
                           // 상태 카드
                           Expanded(
                             child: AdminStateCard(
-                              title: "전체 주문",
-                              orderCount: "$totalOrders건",
+                              title: "진행중",
+                              orderCount: "$pendingOrders건",
                             ),
                           ),
                           Expanded(
                             child: AdminStateCard(
-                              title: "완료",
+                              title: "결제대기",
                               orderCount: "$doneOrders건",
                             ),
                           ),
@@ -146,7 +155,9 @@ class AdminOrderMScreen extends StatelessWidget {
                             alignment: Alignment.center,
                             margin: EdgeInsets.only(right: 8),
                             decoration: BoxDecoration(
-                              color: isSelected ? Colors.white : Colors.grey[200],
+                              color: isSelected
+                                  ? Colors.white
+                                  : Colors.grey[200],
                               borderRadius: BorderRadius.circular(20),
                               border: Border.all(
                                 color: isSelected
@@ -155,21 +166,28 @@ class AdminOrderMScreen extends StatelessWidget {
                               ),
                               boxShadow: isSelected
                                   ? [
-                                BoxShadow(
-                                  color: Color.fromRGBO(158, 158, 158, 0.3),
-                                  blurRadius: 4,
-                                  offset: Offset(0, 2),
-                                )
-                              ]
+                                      BoxShadow(
+                                        color: Color.fromRGBO(
+                                          158,
+                                          158,
+                                          158,
+                                          0.3,
+                                        ),
+                                        blurRadius: 4,
+                                        offset: Offset(0, 2),
+                                      ),
+                                    ]
                                   : [],
                             ),
                             child: Text(
                               status.label,
                               style: TextStyle(
-                                fontWeight:
-                                isSelected ? FontWeight.w600 : FontWeight.w400,
-                                color:
-                                isSelected ? Colors.black : Colors.grey[600],
+                                fontWeight: isSelected
+                                    ? FontWeight.w600
+                                    : FontWeight.w400,
+                                color: isSelected
+                                    ? Colors.black
+                                    : Colors.grey[600],
                               ),
                             ),
                           ),
@@ -186,7 +204,7 @@ class AdminOrderMScreen extends StatelessWidget {
                           .collection('admins')
                           .doc(adminUid)
                           .collection('orders')
-                          .doc(_todayId())
+                          .doc(provider.todayId)
                           .collection('list')
                           .orderBy("createdAt", descending: true)
                           .snapshots(),
@@ -199,12 +217,15 @@ class AdminOrderMScreen extends StatelessWidget {
 
                         final filteredDocs = docs.where((doc) {
                           final status = (doc.data() as Map)["status"];
-                          if (selectedStatus == OrderStatus.table)
+                          if (selectedStatus == OrderStatus.pending) {
                             return status == "pending";
-                          if (selectedStatus == OrderStatus.done)
+                          }
+                          if (selectedStatus == OrderStatus.done) {
                             return status == "done";
-                          if (selectedStatus == OrderStatus.paid)
+                          }
+                          if (selectedStatus == OrderStatus.paid) {
                             return status == "paid";
+                          }
                           return false;
                         }).toList();
 
@@ -212,7 +233,8 @@ class AdminOrderMScreen extends StatelessWidget {
                           return Center(child: Text("해당 주문이 없습니다"));
                         }
 
-                        final Map<String, List<QueryDocumentSnapshot>> grouped = {};
+                        final Map<String, List<QueryDocumentSnapshot>> grouped =
+                            {};
 
                         for (final doc in filteredDocs) {
                           final table = (doc.data() as Map)["tableNumber"];
@@ -238,27 +260,29 @@ class AdminOrderMScreen extends StatelessWidget {
                               final orderId = data["orderId"];
 
                               /// 총 금액
-                              final int totalPrice =
-                              (data["totalPrice"] as num).toInt();
+                              final int totalPrice = (data["totalPrice"] as num)
+                                  .toInt();
                               sumPrice += totalPrice;
 
                               /// 주문 들어온 시간 저장
-                              final createdAt =
-                              (data["createdAt"] as Timestamp).toDate();
+                              final createdAt = (data["createdAt"] as Timestamp)
+                                  .toDate();
 
                               /// 주문 메뉴 리스트
-                              final items =
-                              List<Map<String, dynamic>>.from(data["items"]);
+                              final items = List<Map<String, dynamic>>.from(
+                                data["items"],
+                              );
 
                               /// 주문 시간 형식
-                              final timeStr =
-                                  formatTime(createdAt);
+                              final timeStr = formatTime(createdAt);
 
                               /// 메뉴이름 x 메뉴개수
                               final menu = items
-                                  .map((e) =>
-                              "${e['name']} × ${e['quantity']}")
+                                  .map((e) => "${e['name']} × ${e['quantity']}")
                                   .join(", ");
+
+
+
 
                               /// 주문 요약
                               return OrderList(
@@ -266,10 +290,17 @@ class AdminOrderMScreen extends StatelessWidget {
                                 time: timeStr,
                                 price: "${formatWon(totalPrice)}원",
                                 menu: menu,
-                                onProcess: () =>
-                                    _updateStatus(adminUid, orderId, "done"),
-                                onPaid: () =>
-                                    _updateStatus(adminUid, orderId, "paid"),
+                                onProcess: () => service.updateStatus(
+                                  adminUid: adminUid,
+                                  orderId: orderId,
+                                  newStatus: "done",
+                                ),
+
+                                onPaid: () => service.updateStatus(
+                                  adminUid: adminUid,
+                                  orderId: orderId,
+                                  newStatus: "paid",
+                                ),
                                 currentStatus: selectedStatus,
                               );
                             }).toList();
@@ -284,9 +315,13 @@ class AdminOrderMScreen extends StatelessWidget {
                               status: selectedStatus,
                               onDelete: () {
                                 for (final doc in tableDocs) {
-                                  final orderId =
-                                  (doc.data() as Map)["orderId"];
-                                  _deleteOrder(adminUid, orderId);
+                                  final data = doc.data() as Map<String, dynamic>;
+                                  final orderId = data["orderId"];
+
+                                  service.deleteOrder(
+                                    adminUid: adminUid,
+                                    orderId: orderId,
+                                  );
                                 }
                               },
                               orderLists: orderLists,
@@ -303,39 +338,5 @@ class AdminOrderMScreen extends StatelessWidget {
         },
       ),
     );
-  }
-
-  /// 오늘 날짜 ID
-  String _todayId() {
-    final now = DateTime.now();
-    return "${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}";
-  }
-
-  /// 상태 업데이트
-  Future<void> _updateStatus(
-      String adminUid, String id, String status) async {
-    await FirebaseFirestore.instance
-        .collection('admins')
-        .doc(adminUid)
-        .collection('orders')
-        .doc(_todayId())
-        .collection('list')
-        .doc(id)
-        .update({
-      "status": status,
-      "updatedAt": Timestamp.now(),
-    });
-  }
-
-  /// 삭제
-  Future<void> _deleteOrder(String adminUid, String id) async {
-    await FirebaseFirestore.instance
-        .collection('admins')
-        .doc(adminUid)
-        .collection('orders')
-        .doc(_todayId())
-        .collection('list')
-        .doc(id)
-        .delete();
   }
 }
