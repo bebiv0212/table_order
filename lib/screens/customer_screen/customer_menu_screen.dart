@@ -102,7 +102,7 @@ class _CustomerMenuBody extends StatelessWidget {
             );
           },
         ),
-        logoutBtn:LogoutButton(),
+        logoutBtn: const LogoutButton(requirePassword: true),
       ),
 
       body: Stack(

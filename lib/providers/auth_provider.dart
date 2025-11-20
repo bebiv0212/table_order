@@ -86,6 +86,27 @@ class AuthProvider extends ChangeNotifier {
       return AuthService().mapError(e);
     }
   }
+  // 현재 로그인된 관리자 비밀번호가 맞는지 확인하는 함수
+  Future<bool> verifyCurrentPassword(String password) async {
+    try {
+      final user = _auth.currentUser;
+
+      // 로그인 상태가 아니거나 이메일이 없다면 실패 처리
+      if (user == null || user.email == null) return false;
+
+      final credential = EmailAuthProvider.credential(
+        email: user.email!,   // 🔥 현재 로그인된 계정 이메일
+        password: password,   // 🔥 사용자가 입력한 비밀번호
+      );
+
+      await user.reauthenticateWithCredential(credential);
+      return true; // 비밀번호 일치
+    } catch (e) {
+      debugPrint("verifyCurrentPassword Error: $e");
+      return false; // 비밀번호 불일치 or 오류
+    }
+  }
+
 
   // 로그아웃
   Future<void> signOut() async {
