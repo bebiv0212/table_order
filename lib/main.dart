@@ -7,7 +7,7 @@ import 'package:table_order/providers/auth_provider.dart';
 import 'package:table_order/providers/cart_provider.dart';
 import 'package:table_order/providers/category_provider.dart';
 import 'package:table_order/providers/menu_count_provider.dart';
-import 'package:table_order/screens/select_screen.dart';
+import 'package:table_order/screens/auth/select_screen.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();

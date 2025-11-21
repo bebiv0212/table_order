@@ -80,7 +80,7 @@ class EditableImagePickerBox extends StatelessWidget {
           ),
           SizedBox(height: 4),
           Text(
-            "사진",
+            "*사진",
             style: TextStyle(
               fontSize: 12,
               color: Colors.black54,

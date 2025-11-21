@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:provider/provider.dart';
 import 'package:table_order/providers/auth_provider.dart';
-import 'package:table_order/screens/select_screen.dart';
+import 'package:table_order/screens/auth/select_screen.dart';
 import 'package:table_order/screens/customer_screen/widget/password_dialog.dart';
 
 class LogoutButton extends StatelessWidget {
-  final bool requirePassword;  // 🔥 고객 화면일 때만 true
+  final bool requirePassword; // 🔥 고객 화면일 때만 true
 
   const LogoutButton({super.key, this.requirePassword = false});
 
@@ -32,7 +32,7 @@ class LogoutButton extends StatelessWidget {
           Navigator.pushAndRemoveUntil(
             context,
             MaterialPageRoute(builder: (_) => const SelectScreen()),
-                (route) => false,
+            (route) => false,
           );
         },
       ),

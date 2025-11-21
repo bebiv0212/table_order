@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:provider/provider.dart';
@@ -40,15 +39,9 @@ class MenuFormPage extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // 🔙 상단 뒤로가기 + 제목 영역
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  IconButton(
-                    icon: Icon(LucideIcons.arrowLeft),
-                    onPressed: () => Navigator.pop(context),
-                  ),
-                  SizedBox(width: 12),
-                ],
+              IconButton(
+                icon: Icon(LucideIcons.arrowLeft),
+                onPressed: () => Navigator.pop(context),
               ),
 
               SizedBox(
@@ -68,6 +61,7 @@ class MenuFormPage extends StatelessWidget {
               // 📐 메인 레이아웃 (이미지 + 폼)
               Expanded(
                 child: Row(
+                  spacing: 24,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     // 왼쪽: 이미지 선택 영역
@@ -83,8 +77,6 @@ class MenuFormPage extends StatelessWidget {
                       ),
                     ),
 
-                    SizedBox(width: 24),
-
                     // 오른쪽: 텍스트 필드 + 스위치 + 버튼
                     Expanded(
                       flex: 5,
@@ -93,18 +85,15 @@ class MenuFormPage extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           spacing: 20,
                           children: [
-                            Padding(
-                              padding: EdgeInsets.only(top: 7),
-                              child: GreyTextField(
-                                label: '메뉴명',
-                                hint: '김치찌개',
-                                obscure: false,
-                                controller: prov.nameCtrl,
-                              ),
+                            GreyTextField(
+                              label: '*메뉴명',
+                              hint: '김치찌개',
+                              obscure: false,
+                              controller: prov.nameCtrl,
                             ),
 
                             GreyTextField(
-                              label: '가격',
+                              label: '*가격',
                               hint: '9000',
                               obscure: false,
                               controller: prov.priceCtrl,
@@ -112,7 +101,7 @@ class MenuFormPage extends StatelessWidget {
                             ),
 
                             GreyTextField(
-                              label: '카테고리',
+                              label: '*카테고리',
                               hint: '메인, 음료, 디저트 등',
                               obscure: false,
                               controller: prov.categoryCtrl,
@@ -123,84 +112,85 @@ class MenuFormPage extends StatelessWidget {
                               hint: '메뉴 설명',
                               obscure: false,
                               controller: prov.descCtrl,
-                              maxLines: 4,
-                            ),
-
-                            Row(
-                              children: [
-                                CupertinoSwitch(
-                                  value: prov.isAvailable,
-                                  onChanged: prov.toggle,
-                                  activeTrackColor: AppColors.adminPrimary,
-                                  inactiveTrackColor: Colors.grey,
-                                ),
-                                SizedBox(width: 8),
-                                Text("판매 가능"),
-                              ],
+                              maxLines: 6,
                             ),
 
                             // 저장/수정 버튼
-                            Padding(
-                              padding: EdgeInsets.symmetric(horizontal: 40),
-                              child: SizedBox(
-                                width: double.infinity,
-                                height: 50,
-                                child: TextButton.icon(
-                                  onPressed: prov.isSaving
-                                      ? null
-                                      : () async {
-                                          final result = prov.submit(context);
-                                          if (result == null) return;
+                            Column(
+                              children: [
+                                Padding(
+                                  padding: EdgeInsets.symmetric(horizontal: 40),
+                                  child: SizedBox(
+                                    width: double.infinity,
+                                    height: 60,
+                                    child: TextButton.icon(
+                                      onPressed: prov.isSaving
+                                          ? null
+                                          : () async {
+                                              final result = prov.submit(
+                                                context,
+                                              );
+                                              if (result == null) return;
 
-                                          // ❗ await 전에 context 잡아두기
-                                          final navigator = Navigator.of(
-                                            context,
-                                          );
-
-                                          final success = await prov
-                                              .saveToFirebase(
-                                                adminUid: adminUid,
-                                                oldMenu: isEdit ? menu : null,
+                                              // ❗ await 전에 context 잡아두기
+                                              final navigator = Navigator.of(
+                                                context,
                                               );
 
-                                          if (success) {
-                                            navigator.pop(
-                                              true,
-                                            ); // ✔ async gap 뒤 context 직접 사용 X
-                                          }
-                                        },
-                                  icon: prov.isSaving
-                                      ? SizedBox(
-                                          width: 18,
-                                          height: 18,
-                                          child: CircularProgressIndicator(
-                                            strokeWidth: 2,
-                                            color: Colors.white,
-                                          ),
-                                        )
-                                      : Icon(
-                                          LucideIcons.save,
-                                          size: 18,
+                                              final success = await prov
+                                                  .saveToFirebase(
+                                                    adminUid: adminUid,
+                                                    oldMenu: isEdit
+                                                        ? menu
+                                                        : null,
+                                                  );
+
+                                              if (success) {
+                                                navigator.pop(
+                                                  true,
+                                                ); // ✔ async gap 뒤 context 직접 사용 X
+                                              }
+                                            },
+                                      icon: prov.isSaving
+                                          ? SizedBox(
+                                              width: 18,
+                                              height: 18,
+                                              child: CircularProgressIndicator(
+                                                strokeWidth: 2,
+                                                color: Colors.white,
+                                              ),
+                                            )
+                                          : Icon(
+                                              LucideIcons.save,
+                                              size: 25,
+                                              color: Colors.white,
+                                            ),
+                                      label: Text(
+                                        prov.isSaving
+                                            ? (isEdit ? "수정 중..." : "추가 중...")
+                                            : (isEdit ? "수정" : "추가"),
+                                        style: TextStyle(
                                           color: Colors.white,
+                                          fontSize: 20,
                                         ),
-                                  label: Text(
-                                    prov.isSaving
-                                        ? (isEdit ? "수정 중..." : "추가 중...")
-                                        : (isEdit ? "수정" : "추가"),
-                                    style: TextStyle(color: Colors.white),
-                                  ),
-                                  style: TextButton.styleFrom(
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(10),
-                                    ),
-                                    backgroundColor: AppColors.adminPrimary,
-                                    padding: EdgeInsets.symmetric(
-                                      horizontal: 14,
-                                      vertical: 10,
+                                      ),
+                                      style: TextButton.styleFrom(
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(
+                                            10,
+                                          ),
+                                        ),
+                                        backgroundColor: AppColors.adminPrimary,
+                                        padding: EdgeInsets.symmetric(
+                                          horizontal: 14,
+                                          vertical: 10,
+                                        ),
+                                      ),
                                     ),
                                   ),
                                 ),
-                              ),
+                                _warningText(),
+                              ],
                             ),
                           ],
                         ),
@@ -212,6 +202,48 @@ class MenuFormPage extends StatelessWidget {
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  Text _warningText() {
+    return Text.rich(
+      TextSpan(
+        style: TextStyle(fontSize: 15),
+        children: [
+          TextSpan(
+            text: '( ',
+            style: TextStyle(color: Colors.black),
+          ),
+          TextSpan(
+            text: '*',
+            style: TextStyle(
+              color: Colors.red,
+              fontSize: 16,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+          TextSpan(
+            text: ' ) ',
+            style: TextStyle(color: Colors.black),
+          ),
+          TextSpan(
+            text: '표시는 ',
+            style: TextStyle(color: Colors.black),
+          ),
+          TextSpan(
+            text: '필수입력 ',
+            style: TextStyle(
+              color: Colors.red,
+              fontSize: 16,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+          TextSpan(
+            text: '사항입니다.',
+            style: TextStyle(color: Colors.black),
+          ),
+        ],
       ),
     );
   }

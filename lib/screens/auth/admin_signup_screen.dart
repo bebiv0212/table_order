@@ -1,7 +1,8 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:provider/provider.dart';
-import 'package:table_order/providers/auth_provider.dart';
+import 'package:table_order/providers/auth_provider.dart' as my_auth;
 import 'package:table_order/screens/admin_screen/admin_order_m_screen.dart';
 import 'package:table_order/screens/auth/widget/login_form.dart';
 import 'package:table_order/theme/app_colors.dart';
@@ -17,7 +18,7 @@ class AdminSignupScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final auth = context.watch<AuthProvider>();
+    final auth = context.watch<my_auth.AuthProvider>();
 
     return LoginForm(
       mode: AppMode.admin,
@@ -79,7 +80,9 @@ class AdminSignupScreen extends StatelessWidget {
 
         navigator.pushAndRemoveUntil(
           MaterialPageRoute(
-            builder: (_) => AdminOrderMScreen(adminUid: auth.shopName ?? shop),
+            builder: (_) => AdminOrderMScreen(
+              adminUid: FirebaseAuth.instance.currentUser!.uid,
+            ),
           ),
           (route) => false,
         );

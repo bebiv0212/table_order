@@ -71,29 +71,55 @@ class MenuFormProvider extends ChangeNotifier {
   MenuFormResult? submit(BuildContext context) {
     final name = nameCtrl.text.trim();
     final priceText = priceCtrl.text.trim();
+    final category = categoryCtrl.text.trim();
+    final hasImage =
+        imageFile != null || imageCtrl.text.trim().isNotEmpty; // 🔥 이미지 필수 체크
 
-    // 메뉴명 & 가격은 필수
-    if (name.isEmpty || priceText.isEmpty) {
+    // 1) 메뉴명 필수
+    if (name.isEmpty) {
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(SnackBar(content: Text("메뉴명과 가격은 필수입니다.")));
+      ).showSnackBar(SnackBar(content: Text("메뉴명을 입력해주세요.")));
       return null;
     }
 
-    // 가격 숫자 변환 체크
+    // 2) 가격 필수
+    if (priceText.isEmpty) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text("가격을 입력해주세요.")));
+      return null;
+    }
+
+    // 3) 가격 숫자 변환 검사
     final price = int.tryParse(priceText);
     if (price == null) {
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(SnackBar(content: Text("가격은 숫자로 입력해주세요.")));
+      ).showSnackBar(SnackBar(content: Text("가격은 숫자로만 입력해주세요.")));
       return null;
     }
 
-    // 유효하면 결과 객체 생성해서 반환
+    // 4) 카테고리 필수
+    if (category.isEmpty) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text("카테고리를 입력해주세요.")));
+      return null;
+    }
+
+    // 5) 이미지 필수
+    if (!hasImage) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text("메뉴 이미지를 선택해주세요.")));
+      return null;
+    }
+
     return MenuFormResult(
       name: name,
       price: price,
-      category: categoryCtrl.text.trim(),
+      category: category,
       description: descCtrl.text.trim(),
       imageUrl: imageCtrl.text.trim(),
       isAvailable: isAvailable,
