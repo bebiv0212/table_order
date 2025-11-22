@@ -2,13 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:provider/provider.dart';
 import 'package:table_order/screens/auth/widget/login_form.dart';
 import 'package:table_order/theme/app_colors.dart';
 import 'package:table_order/widgets/common_widgets/grey_text_field.dart';
 import 'package:table_order/screens/customer_screen/customer_menu_screen.dart';
 
+import '../../providers/auth_provider.dart' as my_auth;
+
 class CustomerLoginScreen extends StatelessWidget {
   CustomerLoginScreen({super.key});
+
 
   final _email = TextEditingController();
   final _password = TextEditingController();
@@ -16,6 +20,7 @@ class CustomerLoginScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final auth = context.watch<my_auth.AuthProvider>();
     return LoginForm(
       mode: AppMode.customer,
       title: '고객 주문하기',
@@ -49,6 +54,7 @@ class CustomerLoginScreen extends StatelessWidget {
         final messenger = ScaffoldMessenger.of(context);
         final navigator = Navigator.of(context);
 
+        final err = await auth.signInAdmin(email: email, password: pw);
         if (email.isEmpty || pw.isEmpty || table.isEmpty) {
           messenger.showSnackBar(
             const SnackBar(content: Text('모든 항목을 입력해주세요.')),
@@ -108,7 +114,7 @@ class CustomerLoginScreen extends StatelessWidget {
           );
         }
       },
-      submitText: '주문 시작하기',
+      submitText: auth.loading ? '로그인 중...' : '주문 시작하기',
     );
   }
 }
