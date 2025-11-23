@@ -42,4 +42,33 @@ class AdminService {
         .doc(orderId)
         .delete();
   }
+
+  // 호출 삭제
+  Future<void> deleteStaffCall({
+    required String adminUid,
+    required String callId,
+  }) async {
+    await _db
+        .collection('admins')
+        .doc(adminUid)
+        .collection('staffCalls')
+        .doc(callId)
+        .delete();
+  }
+
+  // 직원 호출 타입 → 한글 변환 맵
+  Map<String, String> staffCallLabelMap = {
+    "water": "물",
+    "fork": "수저/포크",
+    "tissue": "휴지/물티슈",
+    "plate": "앞접시",
+    "apron": "앞치마",
+    "staff": "직원호출",
+  };
+
+// 공용 함수로 가져갈 수도 있음
+  String staffCallLabel(String code) {
+    return staffCallLabelMap[code] ?? code;
+  }
+
 }

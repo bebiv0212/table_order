@@ -75,9 +75,8 @@ class OrderList extends StatelessWidget {
 
               SizedBox(width: 8),
 
-              // 테이블별, 완료 에서만 결제완료 표시
-              if (currentStatus == OrderStatus.pending ||
-                  currentStatus == OrderStatus.done)
+              // 결제대기에서만 표시
+              if (currentStatus == OrderStatus.done)
                 // 결제완료 버튼
                 Expanded(
                   child: OutlinedButton(
