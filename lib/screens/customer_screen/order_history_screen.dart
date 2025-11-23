@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
+import 'package:table_order/screens/customer_screen/widget/review_write_dialog.dart';
 import 'package:table_order/theme/app_colors.dart';
 import 'package:table_order/utlis/format_utils.dart';
 
@@ -70,7 +71,6 @@ class OrderHistoryScreen extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-
                 /// 🔥 진행중 주문
                 if (ongoing.isNotEmpty) ...[
                   Text(
@@ -81,7 +81,7 @@ class OrderHistoryScreen extends StatelessWidget {
 
                   ...ongoing.map((doc) {
                     final order = doc.data() as Map<String, dynamic>;
-                    return _orderBox(order, isDone: false);
+                    return _orderBox(context, order, isDone: false);
                   }),
                   SizedBox(height: 36),
                 ],
@@ -96,7 +96,7 @@ class OrderHistoryScreen extends StatelessWidget {
 
                   ...completed.map((doc) {
                     final order = doc.data() as Map<String, dynamic>;
-                    return _orderBox(order, isDone: true);
+                    return _orderBox(context, order, isDone: true);
                   }),
                 ],
               ],
@@ -107,7 +107,11 @@ class OrderHistoryScreen extends StatelessWidget {
     );
   }
 
-  Widget _orderBox(Map<String, dynamic> order, {required bool isDone}) {
+  Widget _orderBox(
+    BuildContext context,
+    Map<String, dynamic> order, {
+    required bool isDone,
+  }) {
     final items = order['items'] as List<dynamic>;
     final time = formatTime(order['createdAt'].toDate());
 
@@ -115,7 +119,7 @@ class OrderHistoryScreen extends StatelessWidget {
       margin: EdgeInsets.only(bottom: 20),
       padding: EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: isDone ? Colors.white : Color(0xFFFFF9C2),
+        color: isDone ? Colors.white : Color.fromARGB(255, 255, 253, 234),
         borderRadius: BorderRadius.circular(14),
         border: Border.all(color: Colors.black12),
       ),
@@ -143,6 +147,7 @@ class OrderHistoryScreen extends StatelessWidget {
             return Padding(
               padding: EdgeInsets.symmetric(vertical: 8),
               child: Row(
+                spacing: 10,
                 children: [
                   ClipRRect(
                     borderRadius: BorderRadius.circular(6),
@@ -153,80 +158,91 @@ class OrderHistoryScreen extends StatelessWidget {
                       fit: BoxFit.cover,
                     ),
                   ),
-                  SizedBox(width: 12),
 
                   Expanded(
                     child: Column(
+                      spacing: 4,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(item['name'],
-                            style: TextStyle(
-                                fontSize: 18, fontWeight: FontWeight.w600)),
-                        SizedBox(height: 4),
+                        Text(
+                          item['name'],
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
                         Text(
                           '${formatWon(item['price'])}원 × ${item['quantity']}',
-                          style: TextStyle(
-                              fontSize: 16, color: Colors.black54),
+                          style: TextStyle(fontSize: 16, color: Colors.black54),
                         ),
                       ],
                     ),
                   ),
 
-                  Text(
-                    formatWon(item['price'] * item['quantity']),
-                    style: TextStyle(
-                        fontSize: 18, fontWeight: FontWeight.bold),
+                  Column(
+                    spacing: 5,
+                    children: [
+                      Text(
+                        '${formatWon(item['price'] * item['quantity'])}원',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+
+                      /// 🔥 리뷰 버튼 (완료된 주문에서만)
+                      if (isDone) ...[
+                        SizedBox(
+                          width: 100,
+                          height: 40,
+                          child: _reviewBtn(context, item, adminUid),
+                        ),
+                      ],
+                    ],
                   ),
                 ],
               ),
             );
           }),
-
-          /// 🔥 리뷰 버튼 (완료된 주문에서만)
-          if (isDone) ...[
-            Align(
-              alignment: Alignment.centerRight,
-              child: SizedBox(
-                width: 80,
-                height: 36,
-                child: ElevatedButton(
-                  onPressed: () {
-                    // TODO: 리뷰 작성 페이지 연결
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.white,                 // 흰색 배경
-                    foregroundColor: Colors.black87,               // 글자색
-                    elevation: 0,                                  // 🔥 그림자 제거
-                    shadowColor: Colors.transparent,               // 혹시 모를 기본 그림자 제거
-                    padding: EdgeInsets.symmetric(
-                      horizontal: 10,
-                      vertical: 10,
-                    ),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                      side: BorderSide(                       // 🔥 테두리 추가
-                        color: Color(0xFF221004),                   // 원하는 색 (주황)
-                        width: 1.2,
-                      ),
-                    ),
-                  ),
-
-                  child: Row( children: [
-                    Icon(LucideIcons.messageSquare),
-                    SizedBox(width: 10,),
-                    Text(
-                    "리뷰",
-                    style: TextStyle(color: Colors.black, fontSize: 14),
-                  ),
-                ])
-                            ),
-              ),)
-          ],
         ],
       ),
     );
   }
 
+  ElevatedButton _reviewBtn(
+    BuildContext context,
+    Map<String, dynamic> item,
+    String adminUid,
+  ) {
+    return ElevatedButton(
+      onPressed: () {
+        showReviewWriteDialog(
+          context: context,
+          menuId: item["menuId"],
+          menuName: item["name"],
+          adminUid: adminUid,
+        );
+      },
+      style: ElevatedButton.styleFrom(
+        backgroundColor: Colors.white,
+        foregroundColor: Colors.black87,
+        elevation: 0,
+        shadowColor: Colors.transparent,
+        padding: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(8),
+          side: BorderSide(color: Color(0xFF221004), width: 1.2),
+        ),
+      ),
+      child: Row(
+        children: [
+          Icon(LucideIcons.messageSquare),
+          SizedBox(width: 10),
+          Text("리뷰쓰기", style: TextStyle(color: Colors.black, fontSize: 14)),
+        ],
+      ),
+    );
+  }
 
   // 🔥 상태 배지 (진행중 / 완료)
   Widget _statusBadge(bool isDone) {
@@ -284,9 +300,8 @@ class OrderHistoryScreen extends StatelessWidget {
           ElevatedButton(
             onPressed: () => Navigator.pop(context),
             style: ElevatedButton.styleFrom(
-              backgroundColor:AppColors.customerPrimary,
-              padding:
-              EdgeInsets.symmetric(horizontal: 24, vertical: 10),
+              backgroundColor: AppColors.customerPrimary,
+              padding: EdgeInsets.symmetric(horizontal: 24, vertical: 10),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(6),
               ),

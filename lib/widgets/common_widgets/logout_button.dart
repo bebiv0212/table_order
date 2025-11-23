@@ -13,9 +13,9 @@ class LogoutButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(right: 10),
+      padding: EdgeInsets.only(right: 10),
       child: IconButton(
-        icon: const Icon(LucideIcons.logOut),
+        icon: Icon(LucideIcons.logOut),
         onPressed: () async {
           // 고객 화면 → 비밀번호 확인 필요
           if (requirePassword) {
@@ -24,14 +24,18 @@ class LogoutButton extends StatelessWidget {
             if (ok != true) return; // 취소 시 종료
           }
 
+          if (!context.mounted) return;
+
+          final provider = context.read<AuthProvider>();
+
           // 공통 로그아웃
-          await context.read<AuthProvider>().signOut();
+          await provider.signOut();
 
           if (!context.mounted) return;
 
           Navigator.pushAndRemoveUntil(
             context,
-            MaterialPageRoute(builder: (_) => const SelectScreen()),
+            MaterialPageRoute(builder: (_) => SelectScreen()),
             (route) => false,
           );
         },

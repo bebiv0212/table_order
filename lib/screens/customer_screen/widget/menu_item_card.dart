@@ -69,6 +69,7 @@ class MenuItemCard extends StatelessWidget {
           children: [
             //카드 본체
             Card(
+              color: Colors.white,
               elevation: 1, // 살짝 떠 있는 입체감
               margin: EdgeInsets.all(8),
               shape: RoundedRectangleBorder(

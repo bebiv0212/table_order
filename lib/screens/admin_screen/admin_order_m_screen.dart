@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import 'package:table_order/enum/order_status.dart';
 import 'package:table_order/providers/order_provider.dart';
 import 'package:table_order/screens/admin_screen/admin_menu_manage_screen.dart';
+import 'package:table_order/screens/admin_screen/admin_review_manage_screen.dart';
 import 'package:table_order/screens/admin_screen/widget/order_card.dart';
 import 'package:table_order/screens/admin_screen/widget/order_list.dart';
 import 'package:table_order/screens/admin_screen/widget/state_card.dart';
@@ -60,7 +61,13 @@ class AdminOrderMScreen extends StatelessWidget {
                 icon: LucideIcons.messageSquare,
                 title: '리뷰관리',
                 onPressed: () {
-                  debugPrint("리뷰관리 클릭");
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) =>
+                          AdminReviewManageScreen(adminUid: adminUid),
+                    ),
+                  );
                 },
               ),
               logoutBtn: LogoutButton(),
@@ -281,9 +288,6 @@ class AdminOrderMScreen extends StatelessWidget {
                                   .map((e) => "${e['name']} × ${e['quantity']}")
                                   .join(", ");
 
-
-
-
                               /// 주문 요약
                               return OrderList(
                                 id: orderId,
@@ -315,7 +319,8 @@ class AdminOrderMScreen extends StatelessWidget {
                               status: selectedStatus,
                               onDelete: () {
                                 for (final doc in tableDocs) {
-                                  final data = doc.data() as Map<String, dynamic>;
+                                  final data =
+                                      doc.data() as Map<String, dynamic>;
                                   final orderId = data["orderId"];
 
                                   service.deleteOrder(

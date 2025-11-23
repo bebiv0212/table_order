@@ -35,6 +35,7 @@ class OrderService {
       "updatedAt": Timestamp.now(),
       "items": cartItems.map((item) {
         return {
+          "menuId": item["menuId"],
           "name": item["title"],
           "price": item["price"],
           "quantity": item["count"],

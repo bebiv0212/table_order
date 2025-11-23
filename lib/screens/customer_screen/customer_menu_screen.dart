@@ -168,6 +168,7 @@ class _CustomerMenuBody extends StatelessWidget {
                             onIncrease: () {
                               if (!menu.isAvailable) return;
                               cart.addItem({
+                                'menuId': menu.id,
                                 'title': menu.name,
                                 'price': menu.price,
                                 'imageUrl': menu.imageUrl,
@@ -187,6 +188,8 @@ class _CustomerMenuBody extends StatelessWidget {
                                     showDialog(
                                       context: context,
                                       builder: (_) => MenuDetailCard(
+                                        adminUid: adminUid,
+                                        menuId: menu.id,
                                         title: menu.name,
                                         subtitle: menu.description,
                                         price: menu.price,
@@ -204,6 +207,7 @@ class _CustomerMenuBody extends StatelessWidget {
 
                                           if (existIndex == -1) {
                                             cart.addItem({
+                                              'menuId': menu.id,
                                               'title': menu.name,
                                               'price': menu.price,
                                               'imageUrl': menu.imageUrl,

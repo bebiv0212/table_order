@@ -144,7 +144,6 @@ class MenuFormPage extends StatelessWidget {
                                                         ? menu
                                                         : null,
                                                   );
-
                                               if (success) {
                                                 navigator.pop(
                                                   true,

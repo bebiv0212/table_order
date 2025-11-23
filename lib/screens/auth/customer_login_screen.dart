@@ -13,7 +13,6 @@ import '../../providers/auth_provider.dart' as my_auth;
 class CustomerLoginScreen extends StatelessWidget {
   CustomerLoginScreen({super.key});
 
-
   final _email = TextEditingController();
   final _password = TextEditingController();
   final _tableNum = TextEditingController();
@@ -54,7 +53,6 @@ class CustomerLoginScreen extends StatelessWidget {
         final messenger = ScaffoldMessenger.of(context);
         final navigator = Navigator.of(context);
 
-        final err = await auth.signInAdmin(email: email, password: pw);
         if (email.isEmpty || pw.isEmpty || table.isEmpty) {
           messenger.showSnackBar(
             const SnackBar(content: Text('모든 항목을 입력해주세요.')),

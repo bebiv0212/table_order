@@ -35,7 +35,7 @@ class MenuListProvider extends ChangeNotifier {
       /// 1) 서비스에 삭제 요청
       ///    - Firestore: admins/{adminUid}/menus/{menu.id} 삭제
       ///    - Storage: menu.imageUrl 경로의 사진 삭제
-      await _service.deleteMenu(adminUid, menu.id!, menu.imageUrl);
+      await _service.deleteMenu(adminUid, menu.id, menu.imageUrl);
 
       // 2) 로컬 상태에서도 삭제 (UI 즉시 반영)
       menus.removeWhere((m) => m.id == menu.id);
@@ -55,7 +55,7 @@ class MenuListProvider extends ChangeNotifier {
   ) async {
     try {
       // 1️⃣ Firestore에서 판매 여부 업데이트
-      await _service.updateAvailability(adminUid, menu.id!, newValue);
+      await _service.updateAvailability(adminUid, menu.id, newValue);
 
       // 2️⃣ 로컬 리스트 업데이트 (즉시 반영)
       final index = menus.indexWhere((m) => m.id == menu.id);
