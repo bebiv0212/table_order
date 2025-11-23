@@ -16,6 +16,8 @@ import 'package:table_order/providers/cart_provider.dart';
 import 'package:table_order/providers/menu_provider.dart'; // 🔥 추가됨
 import 'package:table_order/widgets/common_widgets/logout_button.dart';
 
+import '../../services/staff_call_service.dart';
+
 class CustomerMenuScreen extends StatelessWidget {
   final String adminUid;
   final String shopName;
@@ -119,9 +121,20 @@ class _CustomerMenuBody extends StatelessWidget {
                   showDialog(
                     context: context,
                     builder: (_) => StaffCallDialog(
-                      onSelect: (type) {
-                        debugPrint("직원 호출: $type");
-                        Navigator.pop(context);
+                      onSelect: (key) async {
+                        final service = StaffCallService();
+
+                        await service.callStaff(
+                          adminUid: adminUid,      // 너가 이미 가지고 있음
+                          tableNumber: tableNumber, // 고객 로그인 때 입력한 테이블 번호
+                          callType: key,            // water, tissue, staff, ...
+                        );
+
+                        Navigator.pop(context); // 다이얼로그 닫기
+
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text("요청이 전송되었습니다.")),
+                        );
                       },
                     ),
                   );

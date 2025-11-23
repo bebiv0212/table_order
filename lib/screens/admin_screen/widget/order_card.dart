@@ -46,10 +46,16 @@ class OrderCard extends StatelessWidget {
                 tableName,
                 style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
               ),
-              IconButton(
-                onPressed: onDelete,
-                icon: Icon(LucideIcons.trash2, size: 18, color: Colors.redAccent),
-              ),
+              // 결제완료 탭에선 표시x
+              if (status != OrderStatus.paid)
+                IconButton(
+                  onPressed: onDelete,
+                  icon: Icon(
+                    LucideIcons.trash2,
+                    size: 18,
+                    color: Colors.redAccent,
+                  ),
+                ),
             ],
           ),
 
