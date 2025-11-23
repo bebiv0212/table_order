@@ -148,7 +148,7 @@ class MenuFormProvider extends ChangeNotifier {
       }
 
       final newData = MenuModel(
-        id: oldMenu?.id,
+        id: oldMenu?.id ?? '',
         name: nameCtrl.text.trim(),
         price: int.parse(priceCtrl.text.trim()),
         category: categoryCtrl.text.trim(),
@@ -160,7 +160,7 @@ class MenuFormProvider extends ChangeNotifier {
       if (oldMenu == null) {
         await _service.addMenu(adminUid, newData);
       } else {
-        await _service.updateMenu(adminUid, oldMenu.id!, newData);
+        await _service.updateMenu(adminUid, oldMenu.id, newData);
 
         if (imageFile != null && oldMenu.imageUrl.isNotEmpty) {
           await _service.deleteImageByUrl(oldMenu.imageUrl);

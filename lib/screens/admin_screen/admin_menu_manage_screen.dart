@@ -3,9 +3,9 @@ import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:provider/provider.dart';
 import 'package:table_order/providers/menu_form_provider.dart';
 import 'package:table_order/providers/menu_list_provider.dart';
-import 'package:table_order/screens/admin_screen/widget/menu_form_page.dart';
+import 'package:table_order/screens/admin_screen/widget/admin_page_appbar.dart';
 import 'package:table_order/screens/admin_screen/widget/menu_card.dart';
-import 'package:table_order/theme/app_colors.dart';
+import 'package:table_order/screens/admin_screen/widget/menu_form_page.dart';
 
 class AdminMenuManageScreen extends StatelessWidget {
   final String adminUid;
@@ -28,56 +28,23 @@ class AdminMenuManageScreen extends StatelessWidget {
           return Scaffold(
             backgroundColor: Color(0xFFF8F8F8),
 
-            appBar: AppBar(
-              backgroundColor: Colors.white,
-              foregroundColor: Colors.black87,
-              elevation: 0.5,
-              toolbarHeight: 80,
-              leading: IconButton(
-                icon: Icon(LucideIcons.arrowLeft),
-                onPressed: () => Navigator.pop(context),
-              ),
-              title: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    '메뉴 관리',
-                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.w600),
-                  ),
-                  Text(
-                    '총 ${menus.length}개 메뉴',
-                    style: TextStyle(color: Colors.black54, fontSize: 14),
-                  ),
-                ],
-              ),
-              actions: [
-                Padding(
-                  padding: EdgeInsets.only(right: 16),
-                  child: TextButton.icon(
-                    onPressed: () async {
-                      await Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => ChangeNotifierProvider(
-                            create: (_) => MenuFormProvider(),
-                            child: MenuFormPage(adminUid: adminUid),
-                          ),
-                        ),
-                      );
-
-                      prov.loadMenus(adminUid); // 돌아오면 새로고침
-                    },
-                    style: TextButton.styleFrom(
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      backgroundColor: AppColors.adminPrimary,
+            appBar: AdminPageAppBar(
+              title: '메뉴 관리',
+              subtitle: '총 ${menus.length}개 메뉴',
+              primaryActionLabel: '메뉴 추가',
+              primaryActionIcon: LucideIcons.plus,
+              onPrimaryAction: () async {
+                await Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => ChangeNotifierProvider(
+                      create: (_) => MenuFormProvider(),
+                      child: MenuFormPage(adminUid: adminUid),
                     ),
-                    icon: Icon(LucideIcons.plus, size: 18, color: Colors.white),
-                    label: Text("메뉴 추가", style: TextStyle(color: Colors.white)),
                   ),
-                ),
-              ],
+                );
+                prov.loadMenus(adminUid);
+              },
             ),
 
             body: prov.loading

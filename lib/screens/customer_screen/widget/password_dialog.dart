@@ -60,14 +60,10 @@ Future<bool?> passwordDialog(BuildContext context) {
                     /// 설명 텍스트
                     Text(
                       '나가기 위해 관리자 비밀번호를 입력해주세요.',
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: Color(0xFF666666),
-                      ),
+                      style: TextStyle(fontSize: 14, color: Color(0xFF666666)),
                     ),
 
                     SizedBox(height: 20), // 24 → 20로 약간 줄임
-
                     /// 비밀번호 입력창
                     TextField(
                       controller: controller,
@@ -99,7 +95,6 @@ Future<bool?> passwordDialog(BuildContext context) {
                     ),
 
                     SizedBox(height: 24), // 28 → 24
-
                     /// 버튼 영역
                     Row(
                       children: [
@@ -108,8 +103,7 @@ Future<bool?> passwordDialog(BuildContext context) {
                           child: InkWell(
                             onTap: isLoading
                                 ? null
-                                : () =>
-                                Navigator.of(dialogContext).pop(false),
+                                : () => Navigator.of(dialogContext).pop(false),
                             child: Container(
                               height: 46, // 50 → 46
                               alignment: Alignment.center,
@@ -137,36 +131,37 @@ Future<bool?> passwordDialog(BuildContext context) {
                             onTap: isLoading
                                 ? null
                                 : () async {
-                              final password =
-                              controller.text.trim();
+                                    final password = controller.text.trim();
 
-                              if (password.isEmpty) {
-                                setState(() {
-                                  errorText = '비밀번호를 입력해주세요.';
-                                });
-                                return;
-                              }
+                                    if (password.isEmpty) {
+                                      setState(() {
+                                        errorText = '비밀번호를 입력해주세요.';
+                                      });
+                                      return;
+                                    }
 
-                              setState(() {
-                                isLoading = true;
-                                errorText = null;
-                              });
+                                    setState(() {
+                                      isLoading = true;
+                                      errorText = null;
+                                    });
 
-                              final auth = dialogContext
-                                  .read<AuthProvider>();
-                              final ok = await auth
-                                  .verifyCurrentPassword(password);
+                                    final auth = dialogContext
+                                        .read<AuthProvider>();
+                                    final ok = await auth.verifyCurrentPassword(
+                                      password,
+                                    );
 
-                              if (ok) {
-                                Navigator.of(dialogContext).pop(true);
-                              } else {
-                                setState(() {
-                                  isLoading = false;
-                                  errorText =
-                                  '비밀번호가 올바르지 않습니다.';
-                                });
-                              }
-                            },
+                                    if (!context.mounted) return;
+
+                                    if (ok) {
+                                      Navigator.of(dialogContext).pop(true);
+                                    } else {
+                                      setState(() {
+                                        isLoading = false;
+                                        errorText = '비밀번호가 올바르지 않습니다.';
+                                      });
+                                    }
+                                  },
                             child: Container(
                               height: 46, // 50 → 46
                               alignment: Alignment.center,
@@ -176,21 +171,21 @@ Future<bool?> passwordDialog(BuildContext context) {
                               ),
                               child: isLoading
                                   ? SizedBox(
-                                height: 18,
-                                width: 18,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2,
-                                  color: Colors.white,
-                                ),
-                              )
+                                      height: 18,
+                                      width: 18,
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2,
+                                        color: Colors.white,
+                                      ),
+                                    )
                                   : Text(
-                                '확인',
-                                style: TextStyle(
-                                  fontSize: 15,
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
+                                      '확인',
+                                      style: TextStyle(
+                                        fontSize: 15,
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
                             ),
                           ),
                         ),

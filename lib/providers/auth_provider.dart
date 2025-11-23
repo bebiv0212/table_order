@@ -16,6 +16,18 @@ class AuthProvider extends ChangeNotifier {
 
   bool get isLoggedIn => _auth.currentUser != null;
 
+  // 기본 태그 목록
+  final defaultTags = [
+    "맛있어요",
+    "음식이 예뻐요",
+    "짜요",
+    "싱거워요",
+    "양이 많아요",
+    "양이 적어요",
+    "빨리 나왔어요",
+    "느려요",
+  ];
+
   // 회원가입
   Future<String?> signUpAdmin({
     required String shopName,
@@ -23,16 +35,34 @@ class AuthProvider extends ChangeNotifier {
     required String password,
   }) async {
     try {
+      // 로딩 처리
       _loading = true;
       notifyListeners();
 
+      // 회원정보 저장
       final user = await _service.signUpAdmin(
         shopName: shopName,
         email: email,
         password: password,
       );
 
-      final doc = await _db.collection('admins').doc(user!.uid).get();
+      final uid = user!.uid;
+
+      final ref = _db.collection('admins').doc(uid).collection('reviewTags');
+
+      // 이미 태그가 없다면 기본 태그 추가
+      final existing = await ref.get();
+      if (existing.docs.isEmpty) {
+        for (final tag in defaultTags) {
+          await ref.add({
+            'name': tag,
+            'createdAt': FieldValue.serverTimestamp(),
+          });
+        }
+      }
+
+      // 관리자 문서 불러오기
+      final doc = await _db.collection('admins').doc(uid).get();
       _shopName = doc.data()?['shopName'];
 
       _loading = false;
@@ -77,6 +107,18 @@ class AuthProvider extends ChangeNotifier {
         _shopName = snap.data()?['shopName'];
       }
 
+      final tagRef = _db.collection('admins').doc(uid).collection('reviewTags');
+      final tagSnap = await tagRef.get();
+
+      if (tagSnap.docs.isEmpty) {
+        for (final tag in defaultTags) {
+          await tagRef.add({
+            'name': tag,
+            'createdAt': FieldValue.serverTimestamp(),
+          });
+        }
+      }
+
       _loading = false;
       notifyListeners();
       return null;
@@ -86,6 +128,7 @@ class AuthProvider extends ChangeNotifier {
       return AuthService().mapError(e);
     }
   }
+
   // 현재 로그인된 관리자 비밀번호가 맞는지 확인하는 함수
   Future<bool> verifyCurrentPassword(String password) async {
     try {
@@ -95,8 +138,8 @@ class AuthProvider extends ChangeNotifier {
       if (user == null || user.email == null) return false;
 
       final credential = EmailAuthProvider.credential(
-        email: user.email!,   // 🔥 현재 로그인된 계정 이메일
-        password: password,   // 🔥 사용자가 입력한 비밀번호
+        email: user.email!, // 🔥 현재 로그인된 계정 이메일
+        password: password, // 🔥 사용자가 입력한 비밀번호
       );
 
       await user.reauthenticateWithCredential(credential);
@@ -106,7 +149,6 @@ class AuthProvider extends ChangeNotifier {
       return false; // 비밀번호 불일치 or 오류
     }
   }
-
 
   // 로그아웃
   Future<void> signOut() async {
