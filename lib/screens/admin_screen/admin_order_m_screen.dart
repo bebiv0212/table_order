@@ -92,7 +92,7 @@ class AdminOrderMScreen extends StatelessWidget {
                       final pendingOrders = docs
                           .where(
                             (d) => (d.data() as Map)['status'] == 'pending',
-                      )
+                          )
                           .length;
 
                       /// 완료 건수
@@ -109,9 +109,9 @@ class AdminOrderMScreen extends StatelessWidget {
                       final int totalRevenue = docs
                           .where((d) => (d.data() as Map)['status'] == 'paid')
                           .fold(0, (total, d) {
-                        final price = (d.data() as Map)['totalPrice'];
-                        return total + (price as num).toInt();
-                      });
+                            final price = (d.data() as Map)['totalPrice'];
+                            return total + (price as num).toInt();
+                          });
 
                       return ExpansionTile(
                         tilePadding: EdgeInsets.zero,
@@ -163,8 +163,9 @@ class AdminOrderMScreen extends StatelessWidget {
                                       .where('status', isEqualTo: 'pending')
                                       .snapshots(),
                                   builder: (context, staffSnapshot) {
-                                    final count =
-                                    staffSnapshot.hasData ? staffSnapshot.data!.docs.length : 0;
+                                    final count = staffSnapshot.hasData
+                                        ? staffSnapshot.data!.docs.length
+                                        : 0;
 
                                     final bool hasCall = count > 0;
 
@@ -173,13 +174,19 @@ class AdminOrderMScreen extends StatelessWidget {
                                       orderCount: "$count건",
                                       icon: Icon(
                                         LucideIcons.bellRing,
-                                        color: hasCall ? Colors.red : Colors.grey,
+                                        color: hasCall
+                                            ? Colors.red
+                                            : Colors.grey,
                                         size: 30,
                                       ),
 
                                       // 추가: 카드 색상 커스텀
-                                      backgroundColor: hasCall ? Color(0xFFFFF1F1) : Colors.white,
-                                      borderColor: hasCall ? Colors.red.shade200 : Colors.grey.shade300,
+                                      backgroundColor: hasCall
+                                          ? Color(0xFFFFF1F1)
+                                          : Colors.white,
+                                      borderColor: hasCall
+                                          ? Colors.red.shade200
+                                          : Colors.grey.shade300,
                                     );
                                   },
                                 ),
@@ -213,10 +220,13 @@ class AdminOrderMScreen extends StatelessWidget {
                               }
 
                               // pending만 필터링
-                              final pendingCalls = snapshot.data!.docs.where(
+                              final pendingCalls = snapshot.data!.docs
+                                  .where(
                                     (d) =>
-                                (d.data() as Map)['status'] == 'pending',
-                              ).toList();
+                                        (d.data() as Map)['status'] ==
+                                        'pending',
+                                  )
+                                  .toList();
 
                               if (pendingCalls.isEmpty) {
                                 return SizedBox();
@@ -224,16 +234,15 @@ class AdminOrderMScreen extends StatelessWidget {
 
                               return Column(
                                 children: pendingCalls.map((doc) {
-                                  final data = doc.data()
-                                  as Map<String, dynamic>;
+                                  final data = doc.data();
 
                                   final callType = data['callType'];
-                                  final label =
-                                  service.staffCallLabel(callType);
+                                  final label = service.staffCallLabel(
+                                    callType,
+                                  );
                                   final table = data['tableNumber'];
                                   final createdAt =
-                                  (data['createdAt'] as Timestamp)
-                                      .toDate();
+                                      (data['createdAt'] as Timestamp).toDate();
 
                                   return Container(
                                     margin: EdgeInsets.only(bottom: 12),
@@ -247,7 +256,7 @@ class AdminOrderMScreen extends StatelessWidget {
                                     ),
                                     child: Row(
                                       mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
+                                          MainAxisAlignment.spaceBetween,
                                       children: [
                                         Row(
                                           children: [
@@ -259,7 +268,7 @@ class AdminOrderMScreen extends StatelessWidget {
                                             SizedBox(width: 10),
                                             Column(
                                               crossAxisAlignment:
-                                              CrossAxisAlignment.start,
+                                                  CrossAxisAlignment.start,
                                               children: [
                                                 Text(
                                                   "테이블 $table - $label",
@@ -290,8 +299,7 @@ class AdminOrderMScreen extends StatelessWidget {
                                             );
                                           },
                                           style: ElevatedButton.styleFrom(
-                                            padding:
-                                            EdgeInsets.symmetric(
+                                            padding: EdgeInsets.symmetric(
                                               horizontal: 24,
                                               vertical: 10,
                                             ),
@@ -339,17 +347,17 @@ class AdminOrderMScreen extends StatelessWidget {
                                       ),
                                       boxShadow: isSelected
                                           ? [
-                                        BoxShadow(
-                                          color: Color.fromRGBO(
-                                            158,
-                                            158,
-                                            158,
-                                            0.3,
-                                          ),
-                                          blurRadius: 4,
-                                          offset: Offset(0, 2),
-                                        ),
-                                      ]
+                                              BoxShadow(
+                                                color: Color.fromRGBO(
+                                                  158,
+                                                  158,
+                                                  158,
+                                                  0.3,
+                                                ),
+                                                blurRadius: 4,
+                                                offset: Offset(0, 2),
+                                              ),
+                                            ]
                                           : [],
                                     ),
                                     child: Text(
@@ -391,8 +399,7 @@ class AdminOrderMScreen extends StatelessWidget {
                               final docs = snapshot.data!.docs;
 
                               final filteredDocs = docs.where((doc) {
-                                final status =
-                                (doc.data() as Map)["status"];
+                                final status = (doc.data() as Map)["status"];
                                 if (selectedStatus == OrderStatus.pending) {
                                   return status == "pending";
                                 }
@@ -406,17 +413,15 @@ class AdminOrderMScreen extends StatelessWidget {
                               }).toList();
 
                               if (filteredDocs.isEmpty) {
-                                return Center(
-                                  child: Text("해당 주문이 없습니다"),
-                                );
+                                return Center(child: Text("해당 주문이 없습니다"));
                               }
 
-                              final Map<String,
-                                  List<QueryDocumentSnapshot>> grouped = {};
+                              final Map<String, List<QueryDocumentSnapshot>>
+                              grouped = {};
 
                               for (final doc in filteredDocs) {
                                 final table =
-                                (doc.data() as Map)["tableNumber"];
+                                    (doc.data() as Map)["tableNumber"];
                                 grouped.putIfAbsent(table, () => []);
                                 grouped[table]!.add(doc);
                               }
@@ -427,8 +432,7 @@ class AdminOrderMScreen extends StatelessWidget {
                                 mainAxisSpacing: 16,
                                 childAspectRatio: 0.85,
                                 shrinkWrap: true,
-                                physics:
-                                NeverScrollableScrollPhysics(),
+                                physics: NeverScrollableScrollPhysics(),
                                 children: grouped.entries.map((entry) {
                                   final tableNumber = entry.key;
                                   final tableDocs = entry.value;
@@ -436,35 +440,37 @@ class AdminOrderMScreen extends StatelessWidget {
                                   int sumPrice = 0;
 
                                   final orderLists = tableDocs.map((doc) {
-                                    final data = doc.data()
-                                    as Map<String, dynamic>;
+                                    final data =
+                                        doc.data() as Map<String, dynamic>;
 
                                     /// 주문 ID
                                     final orderId = data["orderId"];
 
                                     /// 총 금액
                                     final int totalPrice =
-                                    (data["totalPrice"] as num).toInt();
+                                        (data["totalPrice"] as num).toInt();
                                     sumPrice += totalPrice;
 
                                     /// 주문 들어온 시간 저장
                                     final createdAt =
-                                    (data["createdAt"] as Timestamp)
-                                        .toDate();
+                                        (data["createdAt"] as Timestamp)
+                                            .toDate();
 
                                     /// 주문 메뉴 리스트
                                     final items =
-                                    List<Map<String, dynamic>>.from(
-                                      data["items"],
-                                    );
+                                        List<Map<String, dynamic>>.from(
+                                          data["items"],
+                                        );
 
                                     /// 주문 시간 형식
                                     final timeStr = formatTime(createdAt);
 
                                     /// 메뉴이름 x 메뉴개수
                                     final menu = items
-                                        .map((e) =>
-                                    "${e['name']} × ${e['quantity']}")
+                                        .map(
+                                          (e) =>
+                                              "${e['name']} × ${e['quantity']}",
+                                        )
                                         .join(", ");
 
                                     /// 주문 요약
@@ -497,8 +503,8 @@ class AdminOrderMScreen extends StatelessWidget {
                                     status: selectedStatus,
                                     onDelete: () {
                                       for (final doc in tableDocs) {
-                                        final data = doc.data()
-                                        as Map<String, dynamic>;
+                                        final data =
+                                            doc.data() as Map<String, dynamic>;
                                         final orderId = data["orderId"];
 
                                         service.deleteOrder(

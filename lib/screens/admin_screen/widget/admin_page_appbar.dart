@@ -28,7 +28,6 @@ class AdminPageAppBar extends StatelessWidget implements PreferredSizeWidget {
     return AppBar(
       backgroundColor: Colors.white,
       foregroundColor: Colors.black87,
-      elevation: 0.5,
       toolbarHeight: 80,
       leading: IconButton(
         icon: Icon(LucideIcons.arrowLeft),

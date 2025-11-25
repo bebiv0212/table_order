@@ -125,16 +125,18 @@ class _CustomerMenuBody extends StatelessWidget {
                         final service = StaffCallService();
 
                         await service.callStaff(
-                          adminUid: adminUid,      // 너가 이미 가지고 있음
+                          adminUid: adminUid, // 너가 이미 가지고 있음
                           tableNumber: tableNumber, // 고객 로그인 때 입력한 테이블 번호
-                          callType: key,            // water, tissue, staff, ...
+                          callType: key, // water, tissue, staff, ...
                         );
+
+                        if (!context.mounted) return;
 
                         Navigator.pop(context); // 다이얼로그 닫기
 
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text("요청이 전송되었습니다.")),
-                        );
+                        ScaffoldMessenger.of(
+                          context,
+                        ).showSnackBar(SnackBar(content: Text("요청이 전송되었습니다.")));
                       },
                     ),
                   );

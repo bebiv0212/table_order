@@ -6,6 +6,8 @@ import 'package:table_order/providers/menu_list_provider.dart';
 import 'package:table_order/screens/admin_screen/widget/admin_page_appbar.dart';
 import 'package:table_order/screens/admin_screen/widget/menu_card.dart';
 import 'package:table_order/screens/admin_screen/widget/menu_form_page.dart';
+import 'package:table_order/theme/app_colors.dart';
+import 'package:table_order/widgets/common_widgets/empty_screen.dart';
 
 class AdminMenuManageScreen extends StatelessWidget {
   final String adminUid;
@@ -49,6 +51,24 @@ class AdminMenuManageScreen extends StatelessWidget {
 
             body: prov.loading
                 ? Center(child: CircularProgressIndicator())
+                : menus.isEmpty
+                ? EmptyScreen(
+                    message: '등록된 메뉴가 없습니다',
+                    buttonText: '메뉴 추가하기',
+                    buttonColor: AppColors.adminPrimary,
+                    onPressed: () async {
+                      await Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => ChangeNotifierProvider(
+                            create: (_) => MenuFormProvider(),
+                            child: MenuFormPage(adminUid: adminUid),
+                          ),
+                        ),
+                      );
+                      prov.loadMenus(adminUid);
+                    },
+                  )
                 : SingleChildScrollView(
                     padding: EdgeInsets.all(20),
                     child: Column(

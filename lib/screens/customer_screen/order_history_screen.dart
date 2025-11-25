@@ -4,6 +4,7 @@ import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:table_order/screens/customer_screen/widget/review_write_dialog.dart';
 import 'package:table_order/theme/app_colors.dart';
 import 'package:table_order/utlis/format_utils.dart';
+import 'package:table_order/widgets/common_widgets/empty_screen.dart';
 
 class OrderHistoryScreen extends StatelessWidget {
   final String adminUid;
@@ -44,18 +45,23 @@ class OrderHistoryScreen extends StatelessWidget {
 
           final allOrders = snapshot.data!.docs;
 
-          /// 🔥 1) 결제(Paid)된 주문은 아예 숨기기 (Firestore X, 클라이언트에서만 제거)
+          /// 1) 결제(Paid)된 주문은 아예 숨기기 (Firestore X, 클라이언트에서만 제거)
           final visibleOrders = allOrders.where((doc) {
             final o = doc.data() as Map<String, dynamic>;
             return o['status'] != 'paid';
           }).toList();
 
-          /// 🔥 2) 주문이 하나도 안 남으면 "주문 없음" 화면
+          /// 2) 주문이 하나도 안 남으면 "주문 없음" 화면
           if (visibleOrders.isEmpty) {
-            return _buildEmptyView(context);
+            return EmptyScreen(
+              message: '주문 내역이 없습니다',
+              buttonText: '메뉴 보기',
+              buttonColor: AppColors.customerPrimary,
+              onPressed: () => Navigator.pop(context),
+            );
           }
 
-          /// 🔥 3) 진행중 / 완료 분리
+          /// 3) 진행중 / 완료 분리
           final ongoing = visibleOrders.where((doc) {
             final o = doc.data() as Map<String, dynamic>;
             return o['status'] != 'done';
@@ -71,7 +77,7 @@ class OrderHistoryScreen extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                /// 🔥 진행중 주문
+                /// 진행중 주문
                 if (ongoing.isNotEmpty) ...[
                   Text(
                     '진행중인 주문',
@@ -80,13 +86,12 @@ class OrderHistoryScreen extends StatelessWidget {
                   SizedBox(height: 14),
 
                   ...ongoing.map((doc) {
-                    final order = doc.data() as Map<String, dynamic>;
-                    return _orderBox(context, order, isDone: false);
+                    return _orderBox(context, doc, isDone: false);
                   }),
                   SizedBox(height: 36),
                 ],
 
-                /// 🔥 완료된 주문
+                /// 완료된 주문
                 if (completed.isNotEmpty) ...[
                   Text(
                     '완료된 주문',
@@ -95,8 +100,7 @@ class OrderHistoryScreen extends StatelessWidget {
                   SizedBox(height: 14),
 
                   ...completed.map((doc) {
-                    final order = doc.data() as Map<String, dynamic>;
-                    return _orderBox(context, order, isDone: true);
+                    return _orderBox(context, doc, isDone: true);
                   }),
                 ],
               ],
@@ -107,13 +111,20 @@ class OrderHistoryScreen extends StatelessWidget {
     );
   }
 
+  /// 주문 카드 하나
   Widget _orderBox(
     BuildContext context,
-    Map<String, dynamic> order, {
+    QueryDocumentSnapshot<Object?> doc, {
     required bool isDone,
   }) {
+    final order = doc.data() as Map<String, dynamic>;
     final items = order['items'] as List<dynamic>;
     final time = formatTime(order['createdAt'].toDate());
+
+    // 🔥 Firestore 구조에서
+    // admins/{adminUid}/orders/{dateId}/list/{orderId}
+    final String orderId = order['orderId'] ?? doc.id;
+    final String orderDateId = doc.reference.parent.parent!.id;
 
     return Container(
       margin: EdgeInsets.only(bottom: 20),
@@ -126,7 +137,7 @@ class OrderHistoryScreen extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          /// 🔥 상태 + 총가격
+          /// 상태 + 총가격
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -142,8 +153,11 @@ class OrderHistoryScreen extends StatelessWidget {
           Text(time, style: TextStyle(color: Colors.black54, fontSize: 15)),
           SizedBox(height: 16),
 
-          /// 🔥 메뉴 리스트
-          ...items.map((item) {
+          /// 메뉴 리스트
+          ...items.asMap().entries.map((entry) {
+            final index = entry.key;
+            final item = entry.value as Map<String, dynamic>;
+
             return Padding(
               padding: EdgeInsets.symmetric(vertical: 8),
               child: Row(
@@ -190,12 +204,19 @@ class OrderHistoryScreen extends StatelessWidget {
                         ),
                       ),
 
-                      /// 🔥 리뷰 버튼 (완료된 주문에서만)
+                      /// 리뷰 버튼 (완료된 주문에서만)
                       if (isDone) ...[
                         SizedBox(
-                          width: 100,
+                          width: 110,
                           height: 40,
-                          child: _reviewBtn(context, item, adminUid),
+                          child: _reviewBtn(
+                            context,
+                            item,
+                            adminUid,
+                            orderDateId,
+                            orderId,
+                            index,
+                          ),
                         ),
                       ],
                     ],
@@ -209,42 +230,66 @@ class OrderHistoryScreen extends StatelessWidget {
     );
   }
 
+  /// 리뷰 버튼
   ElevatedButton _reviewBtn(
     BuildContext context,
     Map<String, dynamic> item,
     String adminUid,
+    String orderDateId,
+    String orderId,
+    int itemIndex,
   ) {
+    final reviewed = item['reviewed'] == true;
+
     return ElevatedButton(
-      onPressed: () {
-        showReviewWriteDialog(
-          context: context,
-          menuId: item["menuId"],
-          menuName: item["name"],
-          adminUid: adminUid,
-        );
-      },
+      onPressed: reviewed
+          ? null // 이미 리뷰 작성됨 → 비활성
+          : () {
+              showReviewWriteDialog(
+                context: context,
+                menuId: item['menuId'],
+                menuName: item['name'],
+                adminUid: adminUid,
+                orderDateId: orderDateId,
+                orderId: orderId,
+                itemIndex: itemIndex,
+              );
+            },
       style: ElevatedButton.styleFrom(
-        backgroundColor: Colors.white,
+        backgroundColor: reviewed ? Colors.grey[300] : Colors.white,
         foregroundColor: Colors.black87,
         elevation: 0,
         shadowColor: Colors.transparent,
         padding: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(8),
-          side: BorderSide(color: Color(0xFF221004), width: 1.2),
+          side: BorderSide(
+            color: reviewed ? Colors.grey : Color(0xFF221004),
+            width: 1.2,
+          ),
         ),
       ),
       child: Row(
         children: [
-          Icon(LucideIcons.messageSquare),
+          Icon(
+            LucideIcons.messageSquare,
+            color: reviewed ? Colors.grey[600] : Colors.black,
+          ),
           SizedBox(width: 10),
-          Text("리뷰쓰기", style: TextStyle(color: Colors.black, fontSize: 14)),
+          Text(
+            reviewed ? '작성완료' : '리뷰쓰기',
+            style: TextStyle(
+              color: reviewed ? Colors.grey[600] : Colors.black,
+              fontSize: 14,
+              fontWeight: reviewed ? FontWeight.w500 : FontWeight.normal,
+            ),
+          ),
         ],
       ),
     );
   }
 
-  // 🔥 상태 배지 (진행중 / 완료)
+  /// 상태 배지 (진행중 / 완료)
   Widget _statusBadge(bool isDone) {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 10, vertical: 4),
@@ -265,50 +310,6 @@ class OrderHistoryScreen extends StatelessWidget {
             style: TextStyle(
               fontSize: 13,
               color: isDone ? Colors.green : Colors.orange,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  // 🔥 주문 없을 때 화면
-  Widget _buildEmptyView(BuildContext context) {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Container(
-            width: 80,
-            height: 80,
-            decoration: BoxDecoration(
-              color: Color(0xFFEFEFF2),
-              shape: BoxShape.circle,
-            ),
-            child: Icon(LucideIcons.clock4, size: 40, color: Colors.grey),
-          ),
-          SizedBox(height: 20),
-          Text(
-            '주문 내역이 없습니다',
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.w600,
-              color: Colors.black87,
-            ),
-          ),
-          SizedBox(height: 24),
-          ElevatedButton(
-            onPressed: () => Navigator.pop(context),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.customerPrimary,
-              padding: EdgeInsets.symmetric(horizontal: 24, vertical: 10),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(6),
-              ),
-            ),
-            child: Text(
-              '메뉴 보기',
-              style: TextStyle(color: Colors.white, fontSize: 14),
             ),
           ),
         ],

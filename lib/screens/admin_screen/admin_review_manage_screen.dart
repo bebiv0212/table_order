@@ -1,9 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
+import 'package:table_order/screens/admin_screen/admin_menu_manage_screen.dart';
 import 'package:table_order/screens/admin_screen/admin_review_tag_manage_screen.dart';
 import 'package:table_order/screens/admin_screen/widget/admin_page_appbar.dart';
 import 'package:table_order/theme/app_colors.dart';
+import 'package:table_order/widgets/common_widgets/empty_screen.dart';
 
 class AdminReviewManageScreen extends StatelessWidget {
   final String adminUid;
@@ -49,109 +51,129 @@ class AdminReviewManageScreen extends StatelessWidget {
             },
           ),
 
-          body: ListView.separated(
-            padding: EdgeInsets.all(20),
-            itemCount: menus.length,
-            separatorBuilder: (_, __) => SizedBox(height: 20),
-            itemBuilder: (context, index) {
-              final menuDoc = menus[index];
-              final data = menuDoc.data();
+          body: menus.isEmpty
+              ? EmptyScreen(
+                  message: '리뷰를 관리할 메뉴가 없습니다',
+                  buttonText: '메뉴 추가하기',
+                  buttonColor: AppColors.adminPrimary,
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) =>
+                            AdminMenuManageScreen(adminUid: adminUid),
+                      ),
+                    );
+                  },
+                )
+              : ListView.separated(
+                  padding: EdgeInsets.all(20),
+                  itemCount: menus.length,
+                  separatorBuilder: (_, __) => SizedBox(height: 20),
+                  itemBuilder: (context, index) {
+                    final menuDoc = menus[index];
+                    final data = menuDoc.data();
 
-              final menuName = data["name"] ?? "메뉴";
-              final category = data["category"] ?? "기타";
+                    final menuName = data["name"] ?? "메뉴";
+                    final category = data["category"] ?? "기타";
 
-              final reviewMap = Map<String, dynamic>.from(
-                data["reviews"] ?? {},
-              );
+                    final reviewMap = Map<String, dynamic>.from(
+                      data["reviews"] ?? {},
+                    );
 
-              final totalReviewCount = reviewMap.values.fold<int>(
-                0,
-                (total, v) => total + (v as num).toInt(),
-              );
+                    final totalReviewCount = reviewMap.values.fold<int>(
+                      0,
+                      (total, v) => total + (v as num).toInt(),
+                    );
 
-              return Container(
-                padding: EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    /// 제목 + 카테고리
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          menuName,
-                          style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.w700,
+                    return Container(
+                      padding: EdgeInsets.all(20),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          /// 제목 + 카테고리
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                menuName,
+                                style: TextStyle(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
+                              Container(
+                                padding: EdgeInsets.symmetric(
+                                  horizontal: 10,
+                                  vertical: 6,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: Colors.grey[100],
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                child: Text(
+                                  category,
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    color: Colors.black87,
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
-                        ),
-                        Container(
-                          padding: EdgeInsets.symmetric(
-                            horizontal: 10,
-                            vertical: 6,
-                          ),
-                          decoration: BoxDecoration(
-                            color: Colors.grey[100],
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: Text(
-                            category,
+
+                          SizedBox(height: 6),
+
+                          Text(
+                            "총 $totalReviewCount개의 리뷰",
                             style: TextStyle(
-                              fontSize: 13,
-                              color: Colors.black87,
+                              fontSize: 14,
+                              color: Colors.grey[700],
                             ),
                           ),
-                        ),
-                      ],
-                    ),
 
-                    SizedBox(height: 6),
+                          SizedBox(height: 12),
 
-                    Text(
-                      "총 $totalReviewCount개의 리뷰",
-                      style: TextStyle(fontSize: 14, color: Colors.grey[700]),
-                    ),
+                          /// 리뷰 태그들
+                          Wrap(
+                            spacing: 8,
+                            runSpacing: 8,
+                            children: reviewMap.entries.map((entry) {
+                              final label = entry.key;
+                              final count = entry.value;
 
-                    SizedBox(height: 12),
-
-                    /// 리뷰 태그들
-                    Wrap(
-                      spacing: 8,
-                      runSpacing: 8,
-                      children: reviewMap.entries.map((entry) {
-                        final label = entry.key;
-                        final count = entry.value;
-
-                        return Container(
-                          padding: EdgeInsets.symmetric(
-                            horizontal: 10,
-                            vertical: 6,
+                              return Container(
+                                padding: EdgeInsets.symmetric(
+                                  horizontal: 10,
+                                  vertical: 6,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: AppColors.adminBg,
+                                  borderRadius: BorderRadius.circular(12),
+                                  border: Border.all(
+                                    color: AppColors.adminPrimary,
+                                  ),
+                                ),
+                                child: Text(
+                                  "$label $count",
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    color: AppColors.adminPrimary,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              );
+                            }).toList(),
                           ),
-                          decoration: BoxDecoration(
-                            color: Color(0xFFFFF1E6),
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(color: AppColors.adminBg),
-                          ),
-                          child: Text(
-                            "$label ($count)",
-                            style: TextStyle(
-                              fontSize: 13,
-                              color: AppColors.adminPrimary,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        );
-                      }).toList(),
-                    ),
-                  ],
+                        ],
+                      ),
+                    );
+                  },
                 ),
-              );
-            },
-          ),
         );
       },
     );
