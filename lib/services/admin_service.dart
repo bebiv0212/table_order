@@ -22,10 +22,7 @@ class AdminService {
         .doc(todayId)
         .collection('list')
         .doc(orderId)
-        .update({
-      "status": newStatus,
-      "updatedAt": Timestamp.now(),
-    });
+        .update({"status": newStatus, "updatedAt": Timestamp.now()});
   }
 
   /// 주문 삭제
@@ -66,9 +63,8 @@ class AdminService {
     "staff": "직원호출",
   };
 
-// 공용 함수로 가져갈 수도 있음
+  // 공용 함수로 가져갈 수도 있음
   String staffCallLabel(String code) {
     return staffCallLabelMap[code] ?? code;
   }
-
 }

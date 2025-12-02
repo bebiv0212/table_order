@@ -116,7 +116,10 @@ class CartSideSheet extends StatelessWidget {
                           borderRadius: BorderRadius.circular(8),
                         ),
                       ),
-                      child: Text('${formatWon(totalPrice)}원 주문하기'),
+                      child: Text(
+                        '${formatWon(totalPrice)}원 주문하기',
+                        style: TextStyle(color: Colors.white),
+                      ),
                     ),
                   ],
                 ),

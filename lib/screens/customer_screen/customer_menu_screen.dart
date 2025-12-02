@@ -5,6 +5,7 @@ import 'package:table_order/screens/customer_screen/order_history_screen.dart';
 import 'package:table_order/screens/customer_screen/widget/cart_side_sheet.dart';
 import 'package:table_order/screens/customer_screen/widget/staff_call_dialog.dart';
 import 'package:table_order/services/order_service.dart';
+import 'package:table_order/theme/app_colors.dart';
 import 'package:table_order/utlis/format_utils.dart';
 import 'package:table_order/widgets/common_widgets/appbar_action_btn.dart';
 import 'package:table_order/widgets/common_widgets/custom_appbar.dart';
@@ -36,7 +37,7 @@ class CustomerMenuScreen extends StatelessWidget {
       /// 🔥 화면 들어오면 Firebase에서 메뉴 로딩
       create: (_) {
         final provider = MenuProvider();
-        provider.loadMenus(adminUid);
+        provider.listenMenus(adminUid);
         return provider;
       },
 
@@ -323,9 +324,12 @@ class _CustomerMenuBody extends StatelessWidget {
                       );
                     },
                     icon: Icon(LucideIcons.shoppingCart, color: Colors.white),
-                    label: Text('장바구니 보기'),
+                    label: Text(
+                      '장바구니 보기',
+                      style: TextStyle(color: Colors.white),
+                    ),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Color(0xFFE8751A),
+                      backgroundColor: AppColors.customerPrimary,
                       padding: EdgeInsets.symmetric(
                         horizontal: 20,
                         vertical: 12,

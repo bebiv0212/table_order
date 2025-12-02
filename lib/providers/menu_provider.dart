@@ -1,4 +1,6 @@
-import 'package:flutter/material.dart';
+import 'dart:async';
+
+import 'package:flutter/foundation.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:table_order/models/menu_model.dart';
 
@@ -8,25 +10,34 @@ class MenuProvider extends ChangeNotifier {
   List<MenuModel> _menus = [];
   List<MenuModel> get menus => _menus;
 
-  bool _loading = false;
+  bool _loading = true;
   bool get loading => _loading;
 
-  /// 메뉴 불러오기
-  Future<void> loadMenus(String adminUid) async {
+  StreamSubscription? _menuSub;
+
+  /// 🔥 메뉴를 실시간으로 감시
+  void listenMenus(String adminUid) {
     _loading = true;
     notifyListeners();
 
-    final query = await _db
+    _menuSub = _db
         .collection('admins')
         .doc(adminUid)
         .collection('menus')
-        .get();
+        .snapshots()
+        .listen((snapshot) {
+          _menus = snapshot.docs
+              .map((doc) => MenuModel.fromMap(doc.data(), doc.id))
+              .toList();
 
-    _menus = query.docs
-        .map((doc) => MenuModel.fromMap(doc.data(), doc.id))
-        .toList();
+          _loading = false;
+          notifyListeners();
+        });
+  }
 
-    _loading = false;
-    notifyListeners();
+  @override
+  void dispose() {
+    _menuSub?.cancel(); // 메모리 누수 방지
+    super.dispose();
   }
 }

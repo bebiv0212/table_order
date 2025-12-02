@@ -16,12 +16,23 @@ class OrderHistoryScreen extends StatelessWidget {
     required this.tableNumber,
   });
 
+  /// 🔥 오늘 날짜 문자열 생성: yyyy-MM-dd
+  String _todayDocId() {
+    final now = DateTime.now();
+    return "${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}";
+  }
+
   @override
   Widget build(BuildContext context) {
+    final todayId = _todayDocId();
+
+    /// 🔥 오늘 날짜 문서의 list 컬렉션만 읽기
     final ordersRef = FirebaseFirestore.instance
-        .collectionGroup('list')
-        .where('adminUid', isEqualTo: adminUid)
-        .where('tableNumber', isEqualTo: tableNumber)
+        .collection('admins')
+        .doc(adminUid)
+        .collection('orders')
+        .doc(todayId)
+        .collection('list')
         .orderBy('createdAt', descending: true);
 
     return Scaffold(
