@@ -235,7 +235,7 @@ class MenuItemCard extends StatelessWidget {
               ),
             ),
 
-            /// 🔥 품절 표시
+            /// 품절 표시
             if (isSoldOut)
               Positioned(
                 right: 12,

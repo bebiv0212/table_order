@@ -19,12 +19,10 @@ Future<bool?> passwordDialog(BuildContext context) {
           return Dialog(
             elevation: 0,
             backgroundColor: Colors.white,
-            // 여백은 그대로 두고
             insetPadding: EdgeInsets.symmetric(horizontal: 24),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(20),
             ),
-            // 전체 크기 줄이기: maxWidth를 제한
             child: ConstrainedBox(
               constraints: BoxConstraints(
                 maxWidth: 480, // 다이얼로그 가로 최대 폭
@@ -163,7 +161,7 @@ Future<bool?> passwordDialog(BuildContext context) {
                                     }
                                   },
                             child: Container(
-                              height: 46, // 50 → 46
+                              height: 46,
                               alignment: Alignment.center,
                               decoration: BoxDecoration(
                                 color: AppColors.customerPrimary,

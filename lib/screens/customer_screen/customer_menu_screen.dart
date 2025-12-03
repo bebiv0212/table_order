@@ -34,14 +34,14 @@ class CustomerMenuScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      /// 🔥 화면 들어오면 Firebase에서 메뉴 로딩
+      /// 화면 들어오면 Firebase에서 메뉴 로딩
       create: (_) {
         final provider = MenuProvider();
         provider.listenMenus(adminUid);
         return provider;
       },
 
-      /// 🔥 Provider 생성 후 본문 위젯 빌드
+      ///  Provider 생성 후 본문 위젯 빌드
       child: _CustomerMenuBody(
         adminUid: adminUid,
         shopName: shopName,
@@ -51,9 +51,8 @@ class CustomerMenuScreen extends StatelessWidget {
   }
 }
 
-/// ----------------------------------------------------------------------
-/// 🔥 실제 화면 UI는 별도 위젯으로 분리 (Provider rebuild 충돌 방지)
-/// ----------------------------------------------------------------------
+/// 실제 화면 UI는 별도 위젯으로 분리 (Provider rebuild 충돌 방지)
+
 class _CustomerMenuBody extends StatelessWidget {
   final String adminUid;
   final String shopName;
@@ -67,18 +66,18 @@ class _CustomerMenuBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final menuProv = context.watch<MenuProvider>(); // 🔥 Firebase 메뉴 목록
+    final menuProv = context.watch<MenuProvider>(); // Firebase 메뉴 목록
     final category = context.watch<CategoryProvider>().selected;
     final cart = context.watch<CartProvider>();
     final orderService = OrderService();
 
-    // 🔥 카테고리 자동 생성 (중복 제거 + '전체' 추가)
+    // 카테고리 자동 생성 (중복 제거 + '전체' 추가)
     final categories = [
       '전체',
       ...{for (final m in menuProv.menus) m.category},
     ];
 
-    // 🔥 선택된 카테고리로 필터링
+    // 선택된 카테고리로 필터링
     final filteredMenus = category == '전체'
         ? menuProv.menus
         : menuProv.menus.where((m) => m.category == category).toList();
@@ -112,7 +111,7 @@ class _CustomerMenuBody extends StatelessWidget {
         children: [
           Row(
             children: [
-              /// 🔥 카테고리 선택 패널
+              /// 카테고리 선택 패널
               SideCategorySelector(
                 categories: categories,
                 // selectedCategory: category,
@@ -161,7 +160,7 @@ class _CustomerMenuBody extends StatelessWidget {
                         itemBuilder: (context, index) {
                           final menu = filteredMenus[index];
 
-                          // 🔥 현재 장바구니에 몇 개 담겨있나?
+                          // 현재 장바구니에 몇 개 담겨 있는지
                           final current =
                               cart.items.firstWhere(
                                     (e) => e['title'] == menu.name,
@@ -177,10 +176,10 @@ class _CustomerMenuBody extends StatelessWidget {
                             tagText: menu.category,
                             count: current,
 
-                            /// 🔥 품절 처리 적용
+                            /// 품절 처리 적용
                             isSoldOut: !menu.isAvailable,
 
-                            /// 🔥 수량 증가
+                            /// 수량 증가
                             onIncrease: () {
                               if (!menu.isAvailable) return;
                               cart.addItem({
@@ -192,13 +191,13 @@ class _CustomerMenuBody extends StatelessWidget {
                               });
                             },
 
-                            /// 🔥 수량 감소
+                            /// 수량 감소
                             onDecrease: () {
                               if (!menu.isAvailable) return;
                               cart.decreaseItem({'title': menu.name});
                             },
 
-                            /// 🔥 상품 상세 보기
+                            /// 상품 상세 보기
                             onTap: menu.isAvailable
                                 ? () {
                                     showDialog(

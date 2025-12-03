@@ -184,7 +184,6 @@ class MenuDetailCard extends StatelessWidget {
                                         );
 
                                       final top3 = sorted.take(3).toList();
-
                                       return Column(
                                         spacing: 10,
                                         crossAxisAlignment:

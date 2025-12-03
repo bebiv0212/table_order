@@ -16,7 +16,7 @@ class OrderHistoryScreen extends StatelessWidget {
     required this.tableNumber,
   });
 
-  /// 🔥 오늘 날짜 문자열 생성: yyyy-MM-dd
+  /// 오늘 날짜 문자열 생성: yyyy-MM-dd
   String _todayDocId() {
     final now = DateTime.now();
     return "${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}";
@@ -26,7 +26,7 @@ class OrderHistoryScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final todayId = _todayDocId();
 
-    /// 🔥 오늘 날짜 문서의 list 컬렉션만 읽기
+    /// 오늘 날짜 문서의 list 컬렉션만 읽기
     final ordersRef = FirebaseFirestore.instance
         .collection('admins')
         .doc(adminUid)
@@ -132,7 +132,7 @@ class OrderHistoryScreen extends StatelessWidget {
     final items = order['items'] as List<dynamic>;
     final time = formatTime(order['createdAt'].toDate());
 
-    // 🔥 Firestore 구조에서
+    // Firestore 구조에서
     // admins/{adminUid}/orders/{dateId}/list/{orderId}
     final String orderId = order['orderId'] ?? doc.id;
     final String orderDateId = doc.reference.parent.parent!.id;
