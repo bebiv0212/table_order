@@ -9,8 +9,8 @@ Future<void> showReviewWriteDialog({
   required String menuId,
   required String menuName,
 
-  // 🔥 리뷰 작성 후 주문 item에 reviewed:true 찍기 위해 추가된 정보들
-  required String orderDateId, // 예: "2025-11-19"
+  // 리뷰 작성 후 주문 item에 reviewed:true 찍기 위해 추가된 정보들
+  required String orderDateId,
   required String orderId, // list 문서 ID
   required int itemIndex, // items 배열에서 몇 번째인지
 }) {
